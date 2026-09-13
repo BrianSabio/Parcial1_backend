@@ -1,4 +1,4 @@
-# Estructura de carpetas — Proyecto CIKIRE
+# Estructura de carpetas
 
 ```
 CIKIRE/
