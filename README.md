@@ -1,77 +1,56 @@
 # Estructura de carpetas
 
+MVC para API REST con persistencia en JSON utilizando PUG
+
+Persistencia síncrona (`fs.readFileSync` / `fs.writeFileSync`).
+
 ```
-CIKIRE/
+Proyecto/
+├── package.json                    # Configuración del proyecto y dependencias
+├── index.js                        # Punto de entrada y servidor Express
 │
-├── data/                          # Persistencia en JSON
-│   ├── pacientes.json
-│   ├── profesionales.json
-│   ├── disponibilidad.json
-│   ├── servicios.json
-│   └── turnos.json
+├── models/                         # Clases POO
+│   ├── Paciente.js
+│   ├── Profesional.js
+│   ├── Disponibilidad.js
+│   ├── Servicio.js
+│   └── Turno.js
 │
-├── src/
-│   ├── models/                    # Clases POO
-│   │   ├── Paciente.js
-│   │   ├── Profesional.js
-│   │   ├── Disponibilidad.js
-│   │   ├── Servicio.js
-│   │   └── Turno.js
-│   │
-│   ├── repositories/              # Acceso y persistencia sobre los JSON
-│   │   ├── pacienteRepository.js
-│   │   ├── profesionalRepository.js
-│   │   ├── disponibilidadRepository.js
-│   │   ├── servicioRepository.js
-│   │   └── turnoRepository.js
-│   │
-│   ├── controllers/               # Lógica de negocio / manejo de req-res
-│   │   ├── pacienteController.js
-│   │   ├── profesionalController.js
-│   │   ├── disponibilidadController.js
-│   │   ├── servicioController.js
-│   │   └── turnoController.js
-│   │
-│   ├── routes/                    # Definición de rutas Express
-│   │   ├── pacienteRoutes.js
-│   │   ├── profesionalRoutes.js
-│   │   ├── disponibilidadRoutes.js
-│   │   ├── servicioRoutes.js
-│   │   └── turnoRoutes.js
-│   │
-│   ├── middlewares/                # Middleware propio
-│   │   ├── logger.js
-│   │   ├── errorHandler.js
-│   │   └── validarExistencia.js
-│   │
-│   ├── views/                      # Plantillas Pug
-│   │   ├── layout.pug
-│   │   ├── turnos/
-│   │   │   ├── lista.pug
-│   │   │   └── confirmacion.pug
-│   │   └── partials/
-│   │       └── navbar.pug
-│   │
-│   └── utils/                      # Helpers (ids, fechas, etc.)
-│       └── idGenerator.js
+├── controllers/                    # Lógica de negocio / manejo de req-res
+│   ├── pacientesController.js
+│   ├── profesionalesController.js
+│   ├── disponibilidadController.js
+│   ├── serviciosController.js
+│   └── turnosController.js
 │
-├── app.js                          # Configuración de Express (middlewares, vistas, rutas)
-├── server.js                       # Punto de entrada (levanta el servidor)
-├── package.json
-└── README.md
+├── routes/                         # Definición de rutas Express
+│   ├── pacientesRoutes.js
+│   ├── profesionalesRoutes.js
+│   ├── disponibilidadRoutes.js
+│   ├── serviciosRoutes.js
+│   └── turnosRoutes.js
+│
+├── middlewares/
+│   └── errorHandler.js             # Middleware propio (manejo de errores)
+│
+├── views/                          # Pug
+│   ├── turnos.pug
+│   └── layout.pug
+│
+└── data/                           # Persistencia en JSON
+    ├── pacientes.json
+    ├── profesionales.json
+    ├── disponibilidad.json
+    ├── servicios.json
+    └── turnos.json
 ```
 
-## Detalle por capa
-
-| Carpeta | Responsabilidad |
-|---|---|
-| `data/` | Archivos JSON que actúan como base de datos. |
-| `src/models/` | Clases POO puras que representan las entidades (Paciente, Profesional, Disponibilidad, Servicio, Turno). |
-| `src/repositories/` | Únicos responsables de leer/escribir los archivos JSON. |
-| `src/controllers/` | Lógica de negocio y reglas (superposición de horarios, estados, paquetes). Usan los repositories. |
-| `src/routes/` | Definición de endpoints Express, delegan en los controllers. |
-| `src/middlewares/` | Middleware propio: logging, manejo centralizado de errores, validación de existencia de registros. |
-| `src/views/` | Plantillas Pug (listados y confirmaciones). |
-| `src/utils/` | Funciones auxiliares (generación de IDs, formateo de fechas, etc.). |
-| `app.js` | Configuración de Express: middlewares, motor de vistas, montaje de rutas. |
-| `server.js` | Punto de entrada que levanta el servidor. |
+El proyecto sigue una estructura modular de tipo MVC, adaptada para una API REST con persistencia en archivos JSON.
+ 
+- **`index.js`**: punto de entrada de la aplicación. Configura Express, habilita el parseo de JSON en las solicitudes y monta las rutas de cada entidad.
+- **`models/`**: define las clases de cada entidad del sistema (Paciente, Profesional, Disponibilidad, Servicio, Turno), estableciendo la estructura de datos que maneja la aplicación.
+- **`controllers/`**: concentra la lógica de negocio de cada entidad, incluyendo la lectura y escritura síncrona sobre los archivos JSON de `data/` y la validación de las reglas propias del dominio (por ejemplo, evitar la superposición de turnos).
+- **`routes/`**: define los endpoints REST de cada entidad (GET, POST, PUT, DELETE) y delega la ejecución en su controller correspondiente.
+- **`middlewares/`**: contiene el middleware propio del proyecto, en este caso `errorHandler.js`, encargado de centralizar el manejo de errores de la API.
+- **`views/`**: contiene las plantillas Pug utilizadas para la visualización de turnos (listado y layout general).
+- **`data/`**: almacena los archivos JSON que funcionan como base de datos persistente de cada entidad.
