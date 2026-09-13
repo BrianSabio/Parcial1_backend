@@ -1,5 +1,6 @@
-#### Estructura de carpetas
+# Estructura de carpetas — Proyecto CIKIRE
 
+```
 CIKIRE/
 │
 ├── data/                          # Persistencia en JSON
@@ -58,3 +59,19 @@ CIKIRE/
 ├── server.js                       # Punto de entrada (levanta el servidor)
 ├── package.json
 └── README.md
+```
+
+## Detalle por capa
+
+| Carpeta | Responsabilidad |
+|---|---|
+| `data/` | Archivos JSON que actúan como base de datos. |
+| `src/models/` | Clases POO puras que representan las entidades (Paciente, Profesional, Disponibilidad, Servicio, Turno). |
+| `src/repositories/` | Únicos responsables de leer/escribir los archivos JSON. |
+| `src/controllers/` | Lógica de negocio y reglas (superposición de horarios, estados, paquetes). Usan los repositories. |
+| `src/routes/` | Definición de endpoints Express, delegan en los controllers. |
+| `src/middlewares/` | Middleware propio: logging, manejo centralizado de errores, validación de existencia de registros. |
+| `src/views/` | Plantillas Pug (listados y confirmaciones). |
+| `src/utils/` | Funciones auxiliares (generación de IDs, formateo de fechas, etc.). |
+| `app.js` | Configuración de Express: middlewares, motor de vistas, montaje de rutas. |
+| `server.js` | Punto de entrada que levanta el servidor. |
