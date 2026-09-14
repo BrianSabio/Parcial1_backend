@@ -77,7 +77,7 @@ El servidor levanta por defecto en el puerto `3000`.
 | Vista | `GET /vista/turnos` (renderiza el listado de turnos con Pug) |
 
 ## DOCS
-En la raíz de carpetas del sistema se encuentra una llamada "docs", en donde se presentan documentos y diagramas del proyecto.
+En la raíz de carpetas del sistema se encuentra una llamada "docs" en donde se presentan documentos y diagramas del proyecto.
 
 ## Alcance
 
