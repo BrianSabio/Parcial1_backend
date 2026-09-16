@@ -1,17 +1,11 @@
 class Servicio {
-    constructor(id, nombre, duracionMinutos, precio, profesionalIds = []) {
-      this.id = id;
-      this.nombre = nombre;                   
-      this.duracionMinutos = duracionMinutos; 
-      this.precio = precio;                   
-      this.profesionalIds = profesionalIds;   
-    }
-  
-    agregarProfesional(profesionalId) {
-      if (!this.profesionalIds.includes(profesionalId)) {
-        this.profesionalIds.push(profesionalId);
-      }
-    }
+  constructor(id, pacienteId, tipo, sesionesTotales, sesionesConsumidas = 0) {
+    this.id = id;
+    this.pacienteId = pacienteId;                  
+    this.tipo = tipo; 
+    this.sesionesTotales = sesionesTotales;                  
+    this.sesionesConsumidas = sesionesConsumidas;   
   }
-  
-  module.exports = Servicio;
+}
+
+module.exports = Servicio;

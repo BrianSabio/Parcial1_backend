@@ -1,16 +1,12 @@
 class Disponibilidad {
-    constructor(id, profesionalId, diaSemana, horaInicio, horaFin, activo = true) {
-      this.id = id;
-      this.profesionalId = profesionalId; 
-      this.diaSemana = diaSemana;         
-      this.horaInicio = horaInicio;       
-      this.horaFin = horaFin;             
-      this.activo = activo;               
-    }
-  
-    estaEnRango(horaConsulta) {
-      return horaConsulta >= this.horaInicio && horaConsulta < this.horaFin;
-    }
+  constructor(id, profesionalId, fecha, horaInicio, horaFin, disponible = true) {
+    this.id = id;
+    this.profesionalId = profesionalId; 
+    this.fecha = fecha;         
+    this.horaInicio = horaInicio;       
+    this.horaFin = horaFin;             
+    this.disponible = disponible;               
   }
-  
-  module.exports = Disponibilidad;
+}
+
+module.exports = Disponibilidad;
