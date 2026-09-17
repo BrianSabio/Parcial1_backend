@@ -8,9 +8,14 @@ const {
   actualizarTurno,
   cancelarTurno,
   atenderTurno,
-  eliminarTurno
+  eliminarTurno,
+  obtenerTurnosPorPaciente,
+  obtenerAgendaProfesional
 } = require("../controllers/turnosController");
 
+
+router.get('/paciente/:pacienteId', obtenerTurnosPorPaciente);
+router.get('/profesional/:profesionalId', obtenerAgendaProfesional);
 // GET / soporta query params ?profesionalId=, ?fecha=, ?pacienteId=, resueltos en el controller
 router.get("/", obtenerTurnos);
 router.get("/:id", obtenerTurnoPorId);
@@ -19,8 +24,5 @@ router.put("/:id", actualizarTurno);
 router.patch("/:id/cancelar", cancelarTurno);
 router.patch("/:id/atender", atenderTurno);
 router.delete("/:id", eliminarTurno);
-
-router.get('/paciente/:pacienteId', turnosController.obtenerTurnosPorPaciente);
-router.get('/profesional/:profesionalId', turnosController.obtenerAgendaProfesional);
 
 module.exports = router;

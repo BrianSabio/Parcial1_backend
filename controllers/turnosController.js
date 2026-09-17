@@ -246,6 +246,38 @@ const mostrarVistaTurnos = (req, res, next) => {
   }
 };
 
+// Consultas 1 y 2 (la tercera está en servicios)
+const obtenerTurnosPorPaciente = (req, res, next) => {
+  try {
+    const { pacienteId } = req.params;
+    const turnos = readJSON(turnosFilePath);
+    const turnosPaciente = turnos.filter(t => t.pacienteId === pacienteId);
+
+    res.status(200).json(turnosPaciente);
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+const obtenerAgendaProfesional = (req, res, next) => {
+  try {
+    const { profesionalId } = req.params;
+    const { fecha } = req.query; 
+
+    const turnos = readJSON(turnosFilePath);
+    let agenda = turnos.filter(t => t.profesionalId === profesionalId && t.estado !== 'cancelado');
+
+    if (fecha) {
+      agenda = agenda.filter(t => t.fecha === fecha);
+    }
+
+    res.status(200).json(agenda);
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   obtenerTurnos,
   obtenerTurnoPorId,
@@ -260,34 +292,3 @@ module.exports = {
 };
 
 
-// Consultas 1 y 2 (la tercera está en servicios)
-const obtenerTurnosPorPaciente = (req, res, next) => {
-    try {
-      const { pacienteId } = req.params;
-      const turnos = readJSON(turnosFilePath);
-      const turnosPaciente = turnos.filter(t => t.pacienteId === pacienteId);
-  
-      res.status(200).json(turnosPaciente);
-    } catch (error) {
-      next(error);
-    }
-  };
-  
-  
-  const obtenerAgendaProfesional = (req, res, next) => {
-    try {
-      const { profesionalId } = req.params;
-      const { fecha } = req.query; 
-  
-      const turnos = readJSON(turnosFilePath);
-      let agenda = turnos.filter(t => t.profesionalId === profesionalId && t.estado !== 'cancelado');
-  
-      if (fecha) {
-        agenda = agenda.filter(t => t.fecha === fecha);
-      }
-  
-      res.status(200).json(agenda);
-    } catch (error) {
-      next(error);
-    }
-  };

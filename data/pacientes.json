@@ -1,1 +1,10 @@
-[]
+[
+  {
+    "id": "faeb058f-5f15-414d-be89-402493fb37f1",
+    "nombre": "Carlos",
+    "apellido": "Gómez",
+    "dni": "30111222",
+    "telefono": "1144556677",
+    "email": "carlos@gmail.com"
+  }
+]
