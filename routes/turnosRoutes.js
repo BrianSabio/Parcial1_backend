@@ -20,4 +20,7 @@ router.patch("/:id/cancelar", cancelarTurno);
 router.patch("/:id/atender", atenderTurno);
 router.delete("/:id", eliminarTurno);
 
+router.get('/paciente/:pacienteId', turnosController.obtenerTurnosPorPaciente);
+router.get('/profesional/:profesionalId', turnosController.obtenerAgendaProfesional);
+
 module.exports = router;
