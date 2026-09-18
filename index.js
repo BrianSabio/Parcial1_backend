@@ -7,8 +7,8 @@ const PORT = 3000;
 // Rutas de cada entidad
 const pacientesRoutes = require("./routes/pacientesRoutes");
 const profesionalesRoutes = require("./routes/profesionalesRoutes");
-//const disponibilidadRoutes = require("./routes/disponibilidadRoutes");
-//const serviciosRoutes = require("./routes/serviciosRoutes");
+const disponibilidadRoutes = require("./routes/disponibilidadRoutes");
+const serviciosRoutes = require("./routes/serviciosRoutes");
 const turnosRoutes = require("./routes/turnosRoutes");
 
 // Middleware propio
@@ -27,8 +27,8 @@ app.use(express.json());
 // Montaje de rutas de la API
 app.use("/pacientes", pacientesRoutes);
 app.use("/profesionales", profesionalesRoutes);
-//app.use("/disponibilidad", disponibilidadRoutes);
-//app.use("/servicios", serviciosRoutes);
+app.use("/disponibilidad", disponibilidadRoutes);
+app.use("/servicios", serviciosRoutes);
 app.use("/turnos", turnosRoutes);
 
 // Vista Pug

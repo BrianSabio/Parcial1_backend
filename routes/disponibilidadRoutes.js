@@ -2,16 +2,15 @@ const express = require("express");
 const router = express.Router();
 
 const {
-  obtenerDisponibilidad,
-  obtenerDisponibilidadPorId,
+  obtenerDisponibilidades,
+  obtenerDisponibilidadById,
   crearDisponibilidad,
   actualizarDisponibilidad,
   eliminarDisponibilidad
 } = require("../controllers/disponibilidadController");
 
-// GET / soporta query params ?profesionalId= y ?fecha=, resueltos dentro del controller
-router.get("/", obtenerDisponibilidad);
-router.get("/:id", obtenerDisponibilidadPorId);
+router.get("/", obtenerDisponibilidades);
+router.get("/:id", obtenerDisponibilidadById);
 router.post("/", crearDisponibilidad);
 router.put("/:id", actualizarDisponibilidad);
 router.delete("/:id", eliminarDisponibilidad);

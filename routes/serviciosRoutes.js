@@ -3,17 +3,21 @@ const router = express.Router();
 
 const {
   obtenerServicios,
-  obtenerServicioPorId,
+  obtenerServicioById,
   crearServicio,
   actualizarServicio,
-  eliminarServicio
+  eliminarServicio,
+  obtenerEstadoPaquetePaciente
 } = require("../controllers/serviciosController");
 
-// GET / soporta query param ?pacienteId=, resuelto dentro del controller
+
+
 router.get("/", obtenerServicios);
-router.get("/:id", obtenerServicioPorId);
+router.get("/:id", obtenerServicioById);
 router.post("/", crearServicio);
 router.put("/:id", actualizarServicio);
 router.delete("/:id", eliminarServicio);
+// Consulta 3
+router.get("/paciente/:pacienteId/estado", obtenerEstadoPaquetePaciente);
 
 module.exports = router;
