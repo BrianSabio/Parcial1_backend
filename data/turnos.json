@@ -1,1 +1,11 @@
-[]
+[
+  {
+    "id": "324a276f-321f-46fb-ae81-2a04ab18b26b",
+    "pacienteId": "faeb058f-5f15-414d-be89-402493fb37f1",
+    "profesionalId": "9ae33720-7104-446c-99bb-b48e74d0ba27",
+    "servicioId": "bdd51bb4-b2ea-418b-84c0-6d5381a7178d",
+    "fecha": "2026-09-20",
+    "hora": "11:00",
+    "estado": "cancelado"
+  }
+]

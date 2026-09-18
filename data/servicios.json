@@ -1,1 +1,9 @@
-[]
+[
+  {
+    "id": "bdd51bb4-b2ea-418b-84c0-6d5381a7178d",
+    "pacienteId": "faeb058f-5f15-414d-be89-402493fb37f1",
+    "tipo": "paquete",
+    "sesionesTotales": 5,
+    "sesionesConsumidas": 0
+  }
+]
