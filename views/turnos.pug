@@ -1,0 +1,22 @@
+extends layout
+
+block content
+  if turnos.length === 0
+    p.vacio#sinTurnos No hay turnos reservados todavía.
+  else
+    table.listado#tablaTurnos
+      thead
+        tr
+          th Fecha
+          th Hora
+          th Paciente
+          th Profesional
+          th Estado
+      tbody
+        each turno in turnos
+          tr
+            td= turno.fecha
+            td= turno.hora
+            td= turno.pacienteNombre
+            td= turno.profesionalNombre
+            td= turno.estado
