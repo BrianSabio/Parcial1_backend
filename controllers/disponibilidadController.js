@@ -13,6 +13,7 @@ const readData = () => {
 };
 
 const writeData = (data) => {
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
 };
 

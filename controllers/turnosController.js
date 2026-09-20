@@ -20,6 +20,7 @@ const readJSON = (filePath) => {
 };
 
 const writeJSON = (filePath, data) => {
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
 };
 
@@ -213,6 +214,13 @@ const eliminarTurno = (req, res, next) => {
 
     if (index === -1) {
       return res.status(404).json({ mensaje: 'Error: Turno no encontrado' });
+    }
+
+    const servicios = readJSON(serviciosFilePath);
+    const servicioIndex = servicios.findIndex(s => s.id === turnos[index].servicioId);
+    if (servicioIndex !== -1 && servicios[servicioIndex].sesionesConsumidas > 0) {
+      servicios[servicioIndex].sesionesConsumidas -= 1;
+      writeJSON(serviciosFilePath, servicios);
     }
 
     const turnoEliminado = turnos.splice(index, 1);
