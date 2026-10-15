@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const turnoSchema = new mongoose.Schema({
   pacienteId: {
@@ -33,4 +33,4 @@ const turnoSchema = new mongoose.Schema({
   timestamps: true
 });
 
-module.exports = mongoose.model('Turno', turnoSchema);
+export default mongoose.model('Turno', turnoSchema);

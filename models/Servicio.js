@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const servicioSchema = new mongoose.Schema({
   pacienteId: {
@@ -25,4 +25,4 @@ const servicioSchema = new mongoose.Schema({
   timestamps: true
 });
 
-module.exports = mongoose.model('Servicio', servicioSchema);
+export default mongoose.model('Servicio', servicioSchema);

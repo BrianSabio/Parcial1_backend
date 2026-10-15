@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const profesionalSchema = new mongoose.Schema({
   nombre: {
@@ -20,4 +20,4 @@ const profesionalSchema = new mongoose.Schema({
   timestamps: true
 });
 
-module.exports = mongoose.model('Profesional', profesionalSchema);
+export default mongoose.model('Profesional', profesionalSchema);

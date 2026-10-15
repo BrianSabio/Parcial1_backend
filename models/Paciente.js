@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const pacienteSchema = new mongoose.Schema({
   nombre: {
@@ -30,4 +30,4 @@ const pacienteSchema = new mongoose.Schema({
   timestamps: true
 });
 
-module.exports = mongoose.model('Paciente', pacienteSchema);
+export default mongoose.model('Paciente', pacienteSchema);

@@ -20,7 +20,4 @@ const esAutenticado = (req, res, next) => {
     };
   };
   
-  module.exports = {
-    esAutenticado,
-    permitirRoles
-  };
+export { esAutenticado, permitirRoles };

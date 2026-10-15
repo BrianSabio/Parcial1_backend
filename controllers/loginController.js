@@ -2,7 +2,7 @@ import Usuario from '../models/Usuario.js';
 
 
 export const mostrarLogin = (req, res) => {
-  res.render('login', { error: null });
+  res.render('login', { title: 'Iniciar Sesión' });
 };
 
 export const autenticarUsuario = async (req, res, next) => {
@@ -10,7 +10,7 @@ export const autenticarUsuario = async (req, res, next) => {
     const { usuario, password } = req.body;
 
     if (!usuario || !password) {
-      return res.render('login', { error: 'Por favor, ingrese usuario y contraseña.' });
+      return res.status(400).json({ mensaje: 'Por favor, ingrese usuario y contraseña.' });
     }
 
     const usuarioEncontrado = await Usuario.findOne({ usuario, estado: 'activo' })
@@ -18,11 +18,11 @@ export const autenticarUsuario = async (req, res, next) => {
       .populate('profesionalRef');
 
     if (!usuarioEncontrado || usuarioEncontrado.password !== password) {
-      return res.render('login', { error: 'Credenciales inválidas o usuario inactivo.' });
+      return res.status(401).json({ mensaje: 'Credenciales inválidas o usuario inactivo.' });
     }
 
 
-    res.redirect('/vista/turnos');
+    res.status(200).json({ mensaje: 'Autenticación exitosa.', usuario: usuarioEncontrado });
   } catch (error) {
     next(error);
   }

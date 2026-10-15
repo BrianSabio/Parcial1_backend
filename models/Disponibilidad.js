@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const disponibilidadSchema = new mongoose.Schema({
   profesionalId: {
@@ -26,4 +26,4 @@ const disponibilidadSchema = new mongoose.Schema({
   timestamps: true
 });
 
-module.exports = mongoose.model('Disponibilidad', disponibilidadSchema);
+export default mongoose.model('Disponibilidad', disponibilidadSchema);

@@ -28,7 +28,11 @@ const PORT = 3000;
 app.set("views", "./views");
 app.set("view engine", "pug");
 
-// Middlewares para lectura del body 
+
+// Middleware para servir archivos estáticos (CSS, JS, imágenes)
+app.use(express.static('public'));
+
+// Middlewares para parsear JSON y datos de formularios
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -52,6 +56,7 @@ app.get("/vista/turnos", mostrarVistaTurnos);
 // Middleware de manejo de errores
 app.use(errorHandler);
 
+//Arranque del servidor
 app.listen(PORT, () => {
   console.log("Servidor CIKIRE corriendo en puerto " + PORT);
 });

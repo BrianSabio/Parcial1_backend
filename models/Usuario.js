@@ -1,4 +1,3 @@
-// models/Usuario.js
 import mongoose from 'mongoose';
 
 const usuarioSchema = new mongoose.Schema({
