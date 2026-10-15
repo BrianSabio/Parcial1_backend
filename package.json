@@ -10,7 +10,9 @@
   "license": "ISC",
   "description": "API REST de gestión de turnos para CIKIRE, con persistencia en archivos JSON.",
   "dependencies": {
+    "dotenv": "^18.0.8",
     "express": "^5.2.1",
+    "mongoose": "^9.11.2",
     "pug": "^3.0.3"
   },
   "devDependencies": {
