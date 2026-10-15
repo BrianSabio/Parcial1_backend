@@ -1,12 +1,33 @@
-class Paciente {
-  constructor(id, nombre, apellido, dni, telefono, email) {
-    this.id = id;
-    this.nombre = nombre;
-    this.apellido = apellido;
-    this.dni = dni;
-    this.telefono = telefono;
-    this.email = email;
-  }
-}
+const mongoose = require('mongoose');
 
-module.exports = Paciente;
+const pacienteSchema = new mongoose.Schema({
+  nombre: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  apellido: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  dni: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true
+  },
+  telefono: {
+    type: String,
+    trim: true
+  },
+  email: {
+    type: String,
+    trim: true,
+    lowercase: true
+  }
+}, {
+  timestamps: true
+});
+
+module.exports = mongoose.model('Paciente', pacienteSchema);

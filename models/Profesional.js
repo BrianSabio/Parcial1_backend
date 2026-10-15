@@ -1,10 +1,23 @@
-class Profesional {
-  constructor(id, nombre, apellido, especialidad) {
-    this.id = id;
-    this.nombre = nombre;
-    this.apellido = apellido;
-    this.especialidad = especialidad;
-  }
-}
+const mongoose = require('mongoose');
 
-module.exports = Profesional;
+const profesionalSchema = new mongoose.Schema({
+  nombre: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  apellido: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  especialidad: {
+    type: String,
+    required: true,
+    trim: true
+  }
+}, {
+  timestamps: true
+});
+
+module.exports = mongoose.model('Profesional', profesionalSchema);

@@ -1,13 +1,36 @@
-class Turno {
-    constructor(id, pacienteId, profesionalId, servicioId, fecha, hora, estado = 'reservado') {
-      this.id = id;
-      this.pacienteId = pacienteId;
-      this.profesionalId = profesionalId;
-      this.servicioId = servicioId;
-      this.fecha = fecha;
-      this.hora = hora;
-      this.estado = estado;
-    }
+const mongoose = require('mongoose');
+
+const turnoSchema = new mongoose.Schema({
+  pacienteId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Paciente',
+    required: true
+  },
+  profesionalId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Profesional',
+    required: true
+  },
+  servicioId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Servicio',
+    required: true
+  },
+  fecha: {
+    type: String,
+    required: true
+  },
+  hora: {
+    type: String,
+    required: true
+  },
+  estado: {
+    type: String,
+    enum: ['reservado', 'confirmado', 'cancelado', 'atendido'],
+    default: 'reservado'
   }
-  
-  module.exports = Turno;
+}, {
+  timestamps: true
+});
+
+module.exports = mongoose.model('Turno', turnoSchema);

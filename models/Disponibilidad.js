@@ -1,12 +1,29 @@
-class Disponibilidad {
-  constructor(id, profesionalId, fecha, horaInicio, horaFin, disponible = true) {
-    this.id = id;
-    this.profesionalId = profesionalId; 
-    this.fecha = fecha;         
-    this.horaInicio = horaInicio;       
-    this.horaFin = horaFin;             
-    this.disponible = disponible;               
-  }
-}
+const mongoose = require('mongoose');
 
-module.exports = Disponibilidad;
+const disponibilidadSchema = new mongoose.Schema({
+  profesionalId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Profesional',
+    required: true
+  },
+  fecha: {
+    type: String,
+    required: true
+  },
+  horaInicio: {
+    type: String,
+    required: true
+  },
+  horaFin: {
+    type: String,
+    required: true
+  },
+  disponible: {
+    type: Boolean,
+    default: true
+  }
+}, {
+  timestamps: true
+});
+
+module.exports = mongoose.model('Disponibilidad', disponibilidadSchema);
