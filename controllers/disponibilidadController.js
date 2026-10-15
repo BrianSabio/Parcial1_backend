@@ -1,34 +1,16 @@
-const fs = require('fs');
-const path = require('path');
-const crypto = require('crypto');
+import Disponibilidad from '../models/Disponibilidad.js';
 
-const Disponibilidad = require('../models/Disponibilidad');
 
-const filePath = path.join(__dirname, '../data/disponibilidad.json');
-
-const readData = () => {
-  if (!fs.existsSync(filePath)) return [];
-  const data = fs.readFileSync(filePath, 'utf-8');
-  return JSON.parse(data || '[]');
-};
-
-const writeData = (data) => {
-  fs.mkdirSync(path.dirname(filePath), { recursive: true });
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
-};
-
-exports.obtenerDisponibilidades = (req, res, next) => {
+export const obtenerDisponibilidades = async (req, res, next) => {
   try {
     const { profesionalId, fecha } = req.query;
-    let disponibilidades = readData();
+    const filtro = {};
 
-    if (profesionalId) {
-      disponibilidades = disponibilidades.filter(d => d.profesionalId === profesionalId);
-    }
+    if (profesionalId) filtro.profesionalId = profesionalId;
+    if (fecha) filtro.fecha = fecha;
 
-    if (fecha) {
-      disponibilidades = disponibilidades.filter(d => d.fecha === fecha);
-    }
+    const disponibilidades = await Disponibilidad.find(filtro)
+      .populate('profesionalId', 'nombre apellido especialidad');
 
     res.json(disponibilidades);
   } catch (error) {
@@ -36,11 +18,12 @@ exports.obtenerDisponibilidades = (req, res, next) => {
   }
 };
 
-exports.obtenerDisponibilidadById = (req, res, next) => {
+
+export const obtenerDisponibilidadById = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const disponibilidades = readData();
-    const disponibilidad = disponibilidades.find(d => d.id === id);
+    const disponibilidad = await Disponibilidad.findById(id)
+      .populate('profesionalId', 'nombre apellido especialidad');
 
     if (!disponibilidad) {
       return res.status(404).json({ mensaje: 'Disponibilidad no encontrada' });
@@ -52,7 +35,7 @@ exports.obtenerDisponibilidadById = (req, res, next) => {
   }
 };
 
-exports.crearDisponibilidad = (req, res, next) => {
+export const crearDisponibilidad = async (req, res, next) => {
   try {
     const { profesionalId, fecha, horaInicio, horaFin } = req.body;
 
@@ -60,76 +43,74 @@ exports.crearDisponibilidad = (req, res, next) => {
       return res.status(400).json({ mensaje: 'Faltan campos obligatorios' });
     }
 
-    const disponibilidades = readData();
-
-    const conflicto = disponibilidades.some(d => 
-      d.profesionalId === profesionalId &&
-      d.fecha === fecha &&
-      ((horaInicio >= d.horaInicio && horaInicio < d.horaFin) ||
-       (horaFin > d.horaInicio && horaFin <= d.horaFin) ||
-       (horaInicio <= d.horaInicio && horaFin >= d.horaFin))
-    );
+   
+    const conflicto = await Disponibilidad.findOne({
+      profesionalId,
+      fecha,
+      $or: [
+        { horaInicio: { $lte: horaInicio }, horaFin: { $gt: horaInicio } },
+        { horaInicio: { $lt: horaFin }, horaFin: { $gte: horaFin } },
+        { horaInicio: { $gte: horaInicio }, horaFin: { $lte: horaFin } }
+      ]
+    });
 
     if (conflicto) {
-      return res.status(400).json({ mensaje: 'El profesional ya tiene un rango de disponibilidad superpuesto' });
+      return res.status(400).json({ 
+        mensaje: 'El profesional ya tiene un rango de disponibilidad superpuesto' 
+      });
     }
 
-    const newDisponibilidad = new Disponibilidad(
-      crypto.randomUUID(),
+    const nuevaDisponibilidad = new Disponibilidad({
       profesionalId,
       fecha,
       horaInicio,
       horaFin,
-      true
+      disponible: true
+    });
+
+    const disponibilidadGuardada = await nuevaDisponibilidad.save();
+    res.status(201).json(disponibilidadGuardada);
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+export const actualizarDisponibilidad = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const disponibilidadActualizada = await Disponibilidad.findByIdAndUpdate(
+      id,
+      req.body,
+      { new: true, runValidators: true }
     );
 
-    disponibilidades.push(newDisponibilidad);
-    writeData(disponibilidades);
+    if (!disponibilidadActualizada) {
+      return res.status(404).json({ mensaje: 'Disponibilidad no encontrada' });
+    }
 
-    res.status(201).json(newDisponibilidad);
+    res.json(disponibilidadActualizada);
   } catch (error) {
     next(error);
   }
 };
 
-exports.actualizarDisponibilidad = (req, res, next) => {
+
+export const eliminarDisponibilidad = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { fecha, horaInicio, horaFin, disponible } = req.body;
 
-    const disponibilidades = readData();
-    const index = disponibilidades.findIndex(d => d.id === id);
+    const disponibilidadEliminada = await Disponibilidad.findByIdAndDelete(id);
 
-    if (index === -1) {
+    if (!disponibilidadEliminada) {
       return res.status(404).json({ mensaje: 'Disponibilidad no encontrada' });
     }
 
-    if (fecha !== undefined) disponibilidades[index].fecha = fecha;
-    if (horaInicio !== undefined) disponibilidades[index].horaInicio = horaInicio;
-    if (horaFin !== undefined) disponibilidades[index].horaFin = horaFin;
-    if (disponible !== undefined) disponibilidades[index].disponible = disponible;
-
-    writeData(disponibilidades);
-    res.json(disponibilidades[index]);
-  } catch (error) {
-    next(error);
-  }
-};
-
-exports.eliminarDisponibilidad = (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const disponibilidades = readData();
-    const index = disponibilidades.findIndex(d => d.id === id);
-
-    if (index === -1) {
-      return res.status(404).json({ mensaje: 'Disponibilidad no encontrada' });
-    }
-
-    const eliminada = disponibilidades.splice(index, 1);
-    writeData(disponibilidades);
-
-    res.json({ mensaje: 'Disponibilidad eliminada correctamente', disponibilidad: eliminada[0] });
+    res.json({
+      mensaje: 'Disponibilidad eliminada correctamente',
+      disponibilidad: disponibilidadEliminada
+    });
   } catch (error) {
     next(error);
   }

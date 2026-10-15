@@ -1,49 +1,20 @@
-const fs = require("fs");
-const path = require("path");
-const crypto = require("crypto");
+import Profesional from '../models/Profesional.js';
 
-const Profesional = require("../models/Profesional");
 
-const dataPath = path.join(__dirname, "../data/profesionales.json");
-
-// --- FUNCIONES AUXILIARES DE PERSISTENCIA ---
-
-const leerProfesionales = () => {
+export const obtenerProfesionales = async (req, res, next) => {
   try {
-    const data = fs.readFileSync(dataPath, "utf-8");
-    const registros = JSON.parse(data);
-    return registros.map(
-      (p) => new Profesional(p.id, p.nombre, p.apellido, p.especialidad)
-    );
-  } catch (error) {
-    if (error.code === "ENOENT") {
-      return [];
-    }
-    throw error;
-  }
-};
-
-const guardarProfesionales = (profesionales) => {
-  fs.mkdirSync(path.dirname(dataPath), { recursive: true });
-  fs.writeFileSync(dataPath, JSON.stringify(profesionales, null, 2), "utf-8");
-};
-
-// --- CONTROLADORES DE RUTA ---
-
-const obtenerProfesionales = (req, res, next) => {
-  try {
-    const profesionales = leerProfesionales();
+    const profesionales = await Profesional.find();
     return res.status(200).json(profesionales);
   } catch (error) {
     next(error);
   }
 };
 
-const obtenerProfesionalPorId = (req, res, next) => {
+
+export const obtenerProfesionalPorId = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const profesionales = leerProfesionales();
-    const profesional = profesionales.find((p) => p.id === id);
+    const profesional = await Profesional.findById(id);
 
     if (!profesional) {
       return res.status(404).json({ error: "Profesional no encontrado" });
@@ -55,7 +26,7 @@ const obtenerProfesionalPorId = (req, res, next) => {
   }
 };
 
-const crearProfesional = (req, res, next) => {
+export const crearProfesional = async (req, res, next) => {
   try {
     const { nombre, apellido, especialidad } = req.body;
 
@@ -65,70 +36,56 @@ const crearProfesional = (req, res, next) => {
       });
     }
 
-    const profesionales = leerProfesionales();
-
-    const nuevoProfesional = new Profesional(
-      crypto.randomUUID(),
+    const nuevoProfesional = new Profesional({
       nombre,
       apellido,
       especialidad
-    );
+    });
 
-    profesionales.push(nuevoProfesional);
-    guardarProfesionales(profesionales);
+    const profesionalGuardado = await nuevoProfesional.save();
 
     return res.status(201).json({
       mensaje: "Profesional creado",
-      profesional: nuevoProfesional
+      profesional: profesionalGuardado
     });
   } catch (error) {
     next(error);
   }
 };
 
-const actualizarProfesional = (req, res, next) => {
+
+export const actualizarProfesional = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { nombre, apellido, especialidad } = req.body;
-    const profesionales = leerProfesionales();
 
-    const indice = profesionales.findIndex((p) => p.id === id);
-    if (indice === -1) {
-      return res.status(404).json({ error: "Profesional no encontrado" });
-    }
-
-    const actual = profesionales[indice];
-    const actualizado = new Profesional(
-      actual.id,
-      nombre ?? actual.nombre,
-      apellido ?? actual.apellido,
-      especialidad ?? actual.especialidad
+    const profesionalActualizado = await Profesional.findByIdAndUpdate(
+      id,
+      req.body,
+      { new: true, runValidators: true }
     );
 
-    profesionales[indice] = actualizado;
-    guardarProfesionales(profesionales);
+    if (!profesionalActualizado) {
+      return res.status(404).json({ error: "Profesional no encontrado" });
+    }
 
     return res.status(200).json({
       mensaje: "Profesional actualizado",
-      profesional: actualizado
+      profesional: profesionalActualizado
     });
   } catch (error) {
     next(error);
   }
 };
 
-const eliminarProfesional = (req, res, next) => {
+
+export const eliminarProfesional = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const profesionales = leerProfesionales();
+    const profesionalEliminado = await Profesional.findByIdAndDelete(id);
 
-    const indice = profesionales.findIndex((p) => p.id === id);
-    if (indice === -1) {
+    if (!profesionalEliminado) {
       return res.status(404).json({ error: "Profesional no encontrado" });
     }
-
-    const [profesionalEliminado] = profesionales.splice(indice, 1);
-    guardarProfesionales(profesionales);
 
     return res.status(200).json({
       mensaje: "Profesional eliminado",
@@ -139,18 +96,8 @@ const eliminarProfesional = (req, res, next) => {
   }
 };
 
-// --- FUNCIÓN DE APOYO INTERNA ---
 
-const existeProfesional = (profesionalId) => {
-  const profesionales = leerProfesionales();
-  return profesionales.some((p) => p.id === profesionalId);
-};
-
-module.exports = {
-  obtenerProfesionales,
-  obtenerProfesionalPorId,
-  crearProfesional,
-  actualizarProfesional,
-  eliminarProfesional,
-  existeProfesional
+export const existeProfesional = async (profesionalId) => {
+  const profesional = await Profesional.findById(profesionalId);
+  return Boolean(profesional);
 };

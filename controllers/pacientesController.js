@@ -1,49 +1,20 @@
-const fs = require("fs");
-const path = require("path");
-const crypto = require("crypto");
+import Paciente from '../models/Paciente.js';
 
-const Paciente = require("../models/Paciente");
 
-const dataPath = path.join(__dirname, "../data/pacientes.json");
-
-// --- FUNCIONES AUXILIARES DE PERSISTENCIA ---
-
-const leerPacientes = () => {
+export const obtenerPacientes = async (req, res, next) => {
   try {
-    const data = fs.readFileSync(dataPath, "utf-8");
-    const registros = JSON.parse(data);
-    return registros.map(
-      (p) => new Paciente(p.id, p.nombre, p.apellido, p.dni, p.telefono, p.email)
-    );
-  } catch (error) {
-    if (error.code === "ENOENT") {
-      return [];
-    }
-    throw error;
-  }
-};
-
-const guardarPacientes = (pacientes) => {
-  fs.mkdirSync(path.dirname(dataPath), { recursive: true });
-  fs.writeFileSync(dataPath, JSON.stringify(pacientes, null, 2), "utf-8");
-};
-
-// --- CONTROLADORES DE RUTA ---
-
-const obtenerPacientes = (req, res, next) => {
-  try {
-    const pacientes = leerPacientes();
+    const pacientes = await Paciente.find();
     return res.status(200).json(pacientes);
   } catch (error) {
     next(error);
   }
 };
 
-const obtenerPacientePorId = (req, res, next) => {
+
+export const obtenerPacientePorId = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const pacientes = leerPacientes();
-    const paciente = pacientes.find((p) => p.id === id);
+    const paciente = await Paciente.findById(id);
 
     if (!paciente) {
       return res.status(404).json({ error: "Paciente no encontrado" });
@@ -55,7 +26,8 @@ const obtenerPacientePorId = (req, res, next) => {
   }
 };
 
-const crearPaciente = (req, res, next) => {
+
+export const crearPaciente = async (req, res, next) => {
   try {
     const { nombre, apellido, dni, telefono, email } = req.body;
 
@@ -65,49 +37,42 @@ const crearPaciente = (req, res, next) => {
       });
     }
 
-    const pacientes = leerPacientes();
-
-    const dniExistente = pacientes.some((p) => p.dni === dni);
+  
+    const dniExistente = await Paciente.findOne({ dni });
     if (dniExistente) {
       return res.status(400).json({
         error: "Ya existe un paciente registrado con ese DNI"
       });
     }
 
-    const nuevoPaciente = new Paciente(
-      crypto.randomUUID(),
+    const nuevoPaciente = new Paciente({
       nombre,
       apellido,
       dni,
-      telefono ?? null,
-      email ?? null
-    );
+      telefono: telefono ?? null,
+      email: email ?? null
+    });
 
-    pacientes.push(nuevoPaciente);
-    guardarPacientes(pacientes);
+    const pacienteGuardado = await nuevoPaciente.save();
 
     return res.status(201).json({
       mensaje: "Paciente creado",
-      paciente: nuevoPaciente
+      paciente: pacienteGuardado
     });
   } catch (error) {
     next(error);
   }
 };
 
-const actualizarPaciente = (req, res, next) => {
+
+export const actualizarPaciente = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { nombre, apellido, dni, telefono, email } = req.body;
-    const pacientes = leerPacientes();
+    const { dni } = req.body;
 
-    const indice = pacientes.findIndex((p) => p.id === id);
-    if (indice === -1) {
-      return res.status(404).json({ error: "Paciente no encontrado" });
-    }
-
-    if (dni && dni !== pacientes[indice].dni) {
-      const dniEnUso = pacientes.some((p) => p.dni === dni && p.id !== id);
+    // Si se actualiza el DNI, validar que no pertenezca a otro paciente
+    if (dni) {
+      const dniEnUso = await Paciente.findOne({ dni, _id: { $ne: id } });
       if (dniEnUso) {
         return res.status(400).json({
           error: "El DNI ingresado ya está registrado por otro paciente"
@@ -115,18 +80,15 @@ const actualizarPaciente = (req, res, next) => {
       }
     }
 
-    const pacienteActual = pacientes[indice];
-    const pacienteActualizado = new Paciente(
-      pacienteActual.id,
-      nombre ?? pacienteActual.nombre,
-      apellido ?? pacienteActual.apellido,
-      dni ?? pacienteActual.dni,
-      telefono !== undefined ? telefono : pacienteActual.telefono,
-      email !== undefined ? email : pacienteActual.email
+    const pacienteActualizado = await Paciente.findByIdAndUpdate(
+      id,
+      req.body,
+      { new: true, runValidators: true }
     );
 
-    pacientes[indice] = pacienteActualizado;
-    guardarPacientes(pacientes);
+    if (!pacienteActualizado) {
+      return res.status(404).json({ error: "Paciente no encontrado" });
+    }
 
     return res.status(200).json({
       mensaje: "Paciente actualizado",
@@ -137,18 +99,15 @@ const actualizarPaciente = (req, res, next) => {
   }
 };
 
-const eliminarPaciente = (req, res, next) => {
+
+export const eliminarPaciente = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const pacientes = leerPacientes();
+    const pacienteEliminado = await Paciente.findByIdAndDelete(id);
 
-    const indice = pacientes.findIndex((p) => p.id === id);
-    if (indice === -1) {
+    if (!pacienteEliminado) {
       return res.status(404).json({ error: "Paciente no encontrado" });
     }
-
-    const [pacienteEliminado] = pacientes.splice(indice, 1);
-    guardarPacientes(pacientes);
 
     return res.status(200).json({
       mensaje: "Paciente eliminado",
@@ -159,18 +118,7 @@ const eliminarPaciente = (req, res, next) => {
   }
 };
 
-// --- FUNCIÓN DE APOYO INTERNA ---
-
-const existePaciente = (pacienteId) => {
-  const pacientes = leerPacientes();
-  return pacientes.some((p) => p.id === pacienteId);
-};
-
-module.exports = {
-  obtenerPacientes,
-  obtenerPacientePorId,
-  crearPaciente,
-  actualizarPaciente,
-  eliminarPaciente,
-  existePaciente
+export const existePaciente = async (pacienteId) => {
+  const paciente = await Paciente.findById(pacienteId);
+  return Boolean(paciente);
 };

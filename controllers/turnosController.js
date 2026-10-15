@@ -1,43 +1,28 @@
-const fs = require('fs');
-const path = require('path');
-const crypto = require('crypto');
-const Turno = require('../models/Turno');
+import Turno from '../models/Turno.js';
+import Servicio from '../models/Servicio.js';
+import Disponibilidad from '../models/Disponibilidad.js';
 
-const turnosFilePath = path.join(__dirname, '../data/turnos.json');
-const serviciosFilePath = path.join(__dirname, '../data/servicios.json');
-const disponibilidadFilePath = path.join(__dirname, '../data/disponibilidad.json');
-const pacientesFilePath = path.join(__dirname, '../data/pacientes.json');
-const profesionalesFilePath = path.join(__dirname, '../data/profesionales.json');
 
-const readJSON = (filePath) => {
+export const obtenerTurnos = async (req, res, next) => {
   try {
-    if (!fs.existsSync(filePath)) return [];
-    const data = fs.readFileSync(filePath, 'utf-8');
-    return JSON.parse(data || '[]');
-  } catch (error) {
-    return [];
-  }
-};
+    const turnos = await Turno.find()
+      .populate('pacienteId', 'nombre apellido dni')
+      .populate('profesionalId', 'nombre apellido especialidad')
+      .populate('servicioId', 'tipo');
 
-const writeJSON = (filePath, data) => {
-  fs.mkdirSync(path.dirname(filePath), { recursive: true });
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
-};
-
-const obtenerTurnos = (req, res, next) => {
-  try {
-    const turnos = readJSON(turnosFilePath);
     res.status(200).json(turnos);
   } catch (error) {
     next(error);
   }
 };
 
-const obtenerTurnoPorId = (req, res, next) => {
+export const obtenerTurnoPorId = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const turnos = readJSON(turnosFilePath);
-    const turno = turnos.find(t => t.id === id);
+    const turno = await Turno.findById(id)
+      .populate('pacienteId', 'nombre apellido dni')
+      .populate('profesionalId', 'nombre apellido especialidad')
+      .populate('servicioId', 'tipo');
 
     if (!turno) {
       return res.status(404).json({ mensaje: 'Error: Turno no encontrado' });
@@ -49,7 +34,7 @@ const obtenerTurnoPorId = (req, res, next) => {
   }
 };
 
-const crearTurno = (req, res, next) => {
+export const crearTurno = async (req, res, next) => {
   try {
     const { pacienteId, profesionalId, servicioId, fecha, hora } = req.body;
 
@@ -59,192 +44,188 @@ const crearTurno = (req, res, next) => {
       });
     }
 
-    const servicios = readJSON(serviciosFilePath);
-    const servicioIndex = servicios.findIndex(s => s.id === servicioId && s.pacienteId === pacienteId);
+    
+    const servicio = await Servicio.findOne({ _id: servicioId, pacienteId });
 
-    if (servicioIndex === -1) {
-      return res.status(404).json({ mensaje: 'El servicio/paquete especificado no pertenece al paciente o no existe' });
+    if (!servicio) {
+      return res.status(404).json({ 
+        mensaje: 'El servicio/paquete especificado no pertenece al paciente o no existe' 
+      });
     }
 
-    const servicio = servicios[servicioIndex];
     if (servicio.sesionesConsumidas >= servicio.sesionesTotales) {
-      return res.status(400).json({ mensaje: 'El paquete de sesiones de este servicio ya se encuentra agotado' });
+      return res.status(400).json({ 
+        mensaje: 'El paquete de sesiones de este servicio ya se encuentra agotado' 
+      });
     }
 
-    const disponibilidades = readJSON(disponibilidadFilePath);
-    const estaDisponible = disponibilidades.some(d =>
-      d.profesionalId === profesionalId &&
-      d.fecha === fecha &&
-      d.disponible === true &&
-      hora >= d.horaInicio &&
-      hora < d.horaFin
-    );
+    
+    const estaDisponible = await Disponibilidad.findOne({
+      profesionalId,
+      fecha,
+      disponible: true,
+      horaInicio: { $lte: hora },
+      horaFin: { $gt: hora }
+    });
 
     if (!estaDisponible) {
-      return res.status(400).json({ mensaje: 'El profesional no posee disponibilidad horaria configurada en ese rango' });
+      return res.status(400).json({ 
+        mensaje: 'El profesional no posee disponibilidad horaria configurada en ese rango' 
+      });
     }
 
-    const turnos = readJSON(turnosFilePath);
-    const turnoOcupado = turnos.find(t => 
-      t.profesionalId === profesionalId &&
-      t.fecha === fecha &&
-      t.hora === hora &&
-      t.estado !== 'cancelado'
-    );
+    
+    const turnoOcupado = await Turno.findOne({
+      profesionalId,
+      fecha,
+      hora,
+      estado: { $ne: 'cancelado' }
+    });
 
     if (turnoOcupado) {
-      return res.status(409).json({ mensaje: 'El profesional ya tiene un turno reservado en ese horario' });
+      return res.status(409).json({ 
+        mensaje: 'El profesional ya tiene un turno reservado en ese horario' 
+      });
     }
 
-    const nuevoTurno = new Turno(
-      crypto.randomUUID(),
+   
+    const nuevoTurno = new Turno({
       pacienteId,
       profesionalId,
       servicioId,
       fecha,
       hora,
-      'reservado'
+      estado: 'reservado'
+    });
+
+    servicio.sesionesConsumidas += 1;
+    await servicio.save();
+
+    const turnoGuardado = await nuevoTurno.save();
+
+    res.status(201).json({ mensaje: 'Turno creado con éxito', turno: turnoGuardado });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+export const cancelarTurno = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const turno = await Turno.findById(id);
+
+    if (!turno) {
+      return res.status(404).json({ mensaje: 'Error: Turno no encontrado' });
+    }
+
+    if (turno.estado !== 'reservado') {
+      return res.status(400).json({ 
+        mensaje: `El turno no se puede cancelar porque su estado actual es '${turno.estado}'` 
+      });
+    }
+
+    turno.estado = 'cancelado';
+
+
+    const servicio = await Servicio.findById(turno.servicioId);
+    if (servicio && servicio.sesionesConsumidas > 0) {
+      servicio.sesionesConsumidas -= 1;
+      await servicio.save();
+    }
+
+    await turno.save();
+
+    res.status(200).json({ mensaje: 'Turno cancelado correctamente', turno });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+export const atenderTurno = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const turno = await Turno.findById(id);
+
+    if (!turno) {
+      return res.status(404).json({ mensaje: 'Error: Turno no encontrado' });
+    }
+
+    if (turno.estado !== 'reservado') {
+      return res.status(400).json({ 
+        mensaje: `El turno no se puede atender porque su estado actual es '${turno.estado}'` 
+      });
+    }
+
+    turno.estado = 'atendido';
+    await turno.save();
+
+    res.status(200).json({ mensaje: 'Turno marcado como atendido', turno });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const actualizarTurno = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const turnoActualizado = await Turno.findByIdAndUpdate(
+      id,
+      req.body,
+      { new: true, runValidators: true }
     );
 
-    servicios[servicioIndex].sesionesConsumidas += 1;
-    writeJSON(serviciosFilePath, servicios);
-
-    turnos.push(nuevoTurno);
-    writeJSON(turnosFilePath, turnos);
-
-    res.status(201).json({ mensaje: 'Turno creado con éxito', turno: nuevoTurno });
-
-  } catch (error) {
-    next(error);
-  }
-};
-
-const cancelarTurno = (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const turnos = readJSON(turnosFilePath);
-    const index = turnos.findIndex(t => t.id === id);
-
-    if (index === -1) {
+    if (!turnoActualizado) {
       return res.status(404).json({ mensaje: 'Error: Turno no encontrado' });
     }
 
-    if (turnos[index].estado !== 'reservado') {
-      return res.status(400).json({ 
-        mensaje: `El turno no se puede cancelar porque su estado actual es '${turnos[index].estado}'` 
-      });
-    }
-
-    turnos[index].estado = 'cancelado';
-
-    const servicios = readJSON(serviciosFilePath);
-    const servicioIndex = servicios.findIndex(s => s.id === turnos[index].servicioId);
-    if (servicioIndex !== -1 && servicios[servicioIndex].sesionesConsumidas > 0) {
-      servicios[servicioIndex].sesionesConsumidas -= 1;
-      writeJSON(serviciosFilePath, servicios);
-    }
-
-    writeJSON(turnosFilePath, turnos);
-
-    res.status(200).json({ mensaje: 'Turno cancelado correctamente', turno: turnos[index] });
+    res.status(200).json({ mensaje: 'Turno actualizado correctamente', turno: turnoActualizado });
   } catch (error) {
     next(error);
   }
 };
 
-const atenderTurno = (req, res, next) => {
+
+export const eliminarTurno = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const turnos = readJSON(turnosFilePath);
-    const index = turnos.findIndex(t => t.id === id);
+    const turno = await Turno.findById(id);
 
-    if (index === -1) {
+    if (!turno) {
       return res.status(404).json({ mensaje: 'Error: Turno no encontrado' });
     }
 
-    if (turnos[index].estado !== 'reservado') {
-      return res.status(400).json({ 
-        mensaje: `El turno no se puede atender porque su estado actual es '${turnos[index].estado}'` 
-      });
+   
+    const servicio = await Servicio.findById(turno.servicioId);
+    if (servicio && servicio.sesionesConsumidas > 0 && turno.estado === 'reservado') {
+      servicio.sesionesConsumidas -= 1;
+      await servicio.save();
     }
 
-    turnos[index].estado = 'atendido';
-    writeJSON(turnosFilePath, turnos);
+    await Turno.findByIdAndDelete(id);
 
-    res.status(200).json({ mensaje: 'Turno marcado como atendido', turno: turnos[index] });
+    res.status(200).json({ mensaje: 'Turno eliminado permanentemente', turno });
   } catch (error) {
     next(error);
   }
 };
 
-const actualizarTurno = (req, res, next) => {
+
+export const mostrarVistaTurnos = async (req, res, next) => {
   try {
-    const { id } = req.params;
-    const { pacienteId, profesionalId, servicioId, fecha, hora, estado } = req.body;
-    
-    const turnos = readJSON(turnosFilePath);
-    const index = turnos.findIndex(t => t.id === id);
-
-    if (index === -1) {
-      return res.status(404).json({ mensaje: 'Error: Turno no encontrado' });
-    }
-
-    turnos[index] = {
-      ...turnos[index],
-      pacienteId: pacienteId || turnos[index].pacienteId,
-      profesionalId: profesionalId || turnos[index].profesionalId,
-      servicioId: servicioId || turnos[index].servicioId,
-      fecha: fecha || turnos[index].fecha,
-      hora: hora || turnos[index].hora,
-      estado: estado || turnos[index].estado
-    };
-
-    writeJSON(turnosFilePath, turnos);
-    res.status(200).json({ mensaje: 'Turno actualizado correctamente', turno: turnos[index] });
-  } catch (error) {
-    next(error);
-  }
-};
-
-const eliminarTurno = (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const turnos = readJSON(turnosFilePath);
-    const index = turnos.findIndex(t => t.id === id);
-
-    if (index === -1) {
-      return res.status(404).json({ mensaje: 'Error: Turno no encontrado' });
-    }
-
-    const servicios = readJSON(serviciosFilePath);
-    const servicioIndex = servicios.findIndex(s => s.id === turnos[index].servicioId);
-    if (servicioIndex !== -1 && servicios[servicioIndex].sesionesConsumidas > 0) {
-      servicios[servicioIndex].sesionesConsumidas -= 1;
-      writeJSON(serviciosFilePath, servicios);
-    }
-
-    const turnoEliminado = turnos.splice(index, 1);
-    writeJSON(turnosFilePath, turnos);
-
-    res.status(200).json({ mensaje: 'Turno eliminado permanentemente', turno: turnoEliminado[0] });
-  } catch (error) {
-    next(error);
-  }
-};
-
-const mostrarVistaTurnos = (req, res, next) => {
-  try {
-    const turnos = readJSON(turnosFilePath);
-    const pacientes = readJSON(pacientesFilePath);
-    const profesionales = readJSON(profesionalesFilePath);
+    const turnos = await Turno.find()
+      .populate('pacienteId', 'nombre apellido')
+      .populate('profesionalId', 'nombre apellido');
 
     const turnosCompletos = turnos.map(t => {
-      const paciente = pacientes.find(p => p.id === t.pacienteId);
-      const profesional = profesionales.find(p => p.id === t.profesionalId);
+      const p = t.pacienteId;
+      const prof = t.profesionalId;
       return {
-        ...t,
-        pacienteNombre: paciente ? `${paciente.nombre} ${paciente.apellido}` : 'Sin especificar',
-        profesionalNombre: profesional ? `${profesional.nombre} ${profesional.apellido}` : 'Sin especificar'
+        ...t.toObject(),
+        pacienteNombre: p ? `${p.nombre} ${p.apellido}` : 'Sin especificar',
+        profesionalNombre: prof ? `${prof.nombre} ${prof.apellido}` : 'Sin especificar'
       };
     });
 
@@ -254,12 +235,13 @@ const mostrarVistaTurnos = (req, res, next) => {
   }
 };
 
-// Consultas 1 y 2 (la tercera está en servicios)
-const obtenerTurnosPorPaciente = (req, res, next) => {
+
+export const obtenerTurnosPorPaciente = async (req, res, next) => {
   try {
     const { pacienteId } = req.params;
-    const turnos = readJSON(turnosFilePath);
-    const turnosPaciente = turnos.filter(t => t.pacienteId === pacienteId);
+    const turnosPaciente = await Turno.find({ pacienteId })
+      .populate('profesionalId', 'nombre apellido especialidad')
+      .populate('servicioId', 'tipo');
 
     res.status(200).json(turnosPaciente);
   } catch (error) {
@@ -268,35 +250,26 @@ const obtenerTurnosPorPaciente = (req, res, next) => {
 };
 
 
-const obtenerAgendaProfesional = (req, res, next) => {
+export const obtenerAgendaProfesional = async (req, res, next) => {
   try {
     const { profesionalId } = req.params;
-    const { fecha } = req.query; 
+    const { fecha } = req.query;
 
-    const turnos = readJSON(turnosFilePath);
-    let agenda = turnos.filter(t => t.profesionalId === profesionalId && t.estado !== 'cancelado');
+    const filtro = {
+      profesionalId,
+      estado: { $ne: 'cancelado' }
+    };
 
     if (fecha) {
-      agenda = agenda.filter(t => t.fecha === fecha);
+      filtro.fecha = fecha;
     }
+
+    const agenda = await Turno.find(filtro)
+      .populate('pacienteId', 'nombre apellido dni')
+      .populate('servicioId', 'tipo');
 
     res.status(200).json(agenda);
   } catch (error) {
     next(error);
   }
 };
-
-module.exports = {
-  obtenerTurnos,
-  obtenerTurnoPorId,
-  crearTurno,
-  actualizarTurno,
-  cancelarTurno,
-  atenderTurno,
-  eliminarTurno,
-  mostrarVistaTurnos,
-  obtenerTurnosPorPaciente,
-  obtenerAgendaProfesional
-};
-
-

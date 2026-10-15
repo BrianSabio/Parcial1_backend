@@ -1,35 +1,22 @@
-const fs = require('fs');
-const path = require('path');
-const crypto = require('crypto');
-const Servicio = require('../models/Servicio');
+import Servicio from '../models/Servicio.js';
 
-const filePath = path.join(__dirname, '../data/servicios.json');
 
-const readData = () => {
-  if (!fs.existsSync(filePath)) return [];
-  const data = fs.readFileSync(filePath, 'utf-8');
-  return JSON.parse(data || '[]');
-};
-
-const writeData = (data) => {
-  fs.mkdirSync(path.dirname(filePath), { recursive: true });
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
-};
-
-exports.obtenerServicios = (req, res, next) => {
+export const obtenerServicios = async (req, res, next) => {
   try {
-    const servicios = readData();
+    const servicios = await Servicio.find()
+      .populate('pacienteId', 'nombre apellido dni');
+      
     res.json(servicios);
   } catch (error) {
     next(error);
   }
 };
 
-exports.obtenerServicioById = (req, res, next) => {
+export const obtenerServicioById = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const servicios = readData();
-    const servicio = servicios.find(s => s.id === id);
+    const servicio = await Servicio.findById(id)
+      .populate('pacienteId', 'nombre apellido dni');
 
     if (!servicio) {
       return res.status(404).json({ mensaje: 'Servicio no encontrado' });
@@ -42,96 +29,89 @@ exports.obtenerServicioById = (req, res, next) => {
 };
 
 
-exports.crearServicio = (req, res, next) => {
+export const crearServicio = async (req, res, next) => {
   try {
     const { pacienteId, tipo, sesionesTotales } = req.body;
 
     if (!pacienteId || !tipo || sesionesTotales === undefined) {
-      return res.status(400).json({ mensaje: 'pacienteId, tipo y sesionesTotales son obligatorios' });
+      return res.status(400).json({ 
+        mensaje: 'pacienteId, tipo y sesionesTotales son obligatorios' 
+      });
     }
 
-    const servicios = readData();
-
-    
-    const newServicio = new Servicio(
-      crypto.randomUUID(),
+    const nuevoServicio = new Servicio({
       pacienteId,
       tipo,
-      parseInt(sesionesTotales),
-      0 
-    );
+      sesionesTotales: Number(sesionesTotales),
+      sesionesConsumidas: 0
+    });
 
-    servicios.push(newServicio);
-    writeData(servicios);
+    const servicioGuardado = await nuevoServicio.save();
 
-    res.status(201).json(newServicio);
+    res.status(201).json(servicioGuardado);
   } catch (error) {
     next(error);
   }
 };
 
-exports.actualizarServicio = (req, res, next) => {
+
+export const actualizarServicio = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { tipo, sesionesTotales, sesionesConsumidas } = req.body;
 
-    const servicios = readData();
-    const index = servicios.findIndex(s => s.id === id);
+    const servicioActualizado = await Servicio.findByIdAndUpdate(
+      id,
+      req.body,
+      { new: true, runValidators: true }
+    );
 
-    if (index === -1) {
+    if (!servicioActualizado) {
       return res.status(404).json({ mensaje: 'Servicio no encontrado' });
     }
 
-    if (tipo !== undefined) servicios[index].tipo = tipo;
-    if (sesionesTotales !== undefined) servicios[index].sesionesTotales = parseInt(sesionesTotales);
-    if (sesionesConsumidas !== undefined) servicios[index].sesionesConsumidas = parseInt(sesionesConsumidas);
-
-    writeData(servicios);
-    res.json(servicios[index]);
+    res.json(servicioActualizado);
   } catch (error) {
     next(error);
   }
 };
 
-exports.eliminarServicio = (req, res, next) => {
-    try {
-      const { id } = req.params;
-      const servicios = readData();
-      const index = servicios.findIndex(s => s.id === id);
-  
-      if (index === -1) {
-        return res.status(404).json({ mensaje: 'Servicio no encontrado' });
-      }
-  
-      const eliminado = servicios.splice(index, 1);
-      writeData(servicios);
-  
-      res.json({ mensaje: 'Servicio eliminado correctamente', servicio: eliminado[0] });
-    } catch (error) {
-      next(error);
+
+export const eliminarServicio = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const servicioEliminado = await Servicio.findByIdAndDelete(id);
+
+    if (!servicioEliminado) {
+      return res.status(404).json({ mensaje: 'Servicio no encontrado' });
     }
-  };
 
-//Acá esta la tercer consulta
-exports.obtenerEstadoPaquetePaciente = (req, res, next) => {
-    try {
-      const { pacienteId } = req.params;
-      const servicios = readData();
-      const serviciosPaciente = servicios.filter(s => s.pacienteId === pacienteId);
-  
-      const resumen = serviciosPaciente.map(s => ({
-        servicioId: s.id,
-        tipo: s.tipo,
-        sesionesTotales: s.sesionesTotales,
-        sesionesConsumidas: s.sesionesConsumidas,
-        sesionesRestantes: s.sesionesTotales - s.sesionesConsumidas
-      }));
-  
-      res.status(200).json(resumen);
-    } catch (error) {
-      next(error);
-    }
-  };
+    res.json({ 
+      mensaje: 'Servicio eliminado correctamente', 
+      servicio: servicioEliminado 
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 
+export const obtenerEstadoPaquetePaciente = async (req, res, next) => {
+  try {
+    const { pacienteId } = req.params;
 
+    const serviciosPaciente = await Servicio.find({ pacienteId });
+
+    const resumen = serviciosPaciente.map(s => ({
+      servicioId: s._id,
+      tipo: s.tipo,
+      sesionesTotales: s.sesionesTotales,
+      sesionesConsumidas: s.sesionesConsumidas,
+      sesionesRestantes: s.sesionesTotales - s.sesionesConsumidas
+    }));
+
+    res.status(200).json(resumen);
+  } catch (error) {
+    next(error);
+  }
+};
