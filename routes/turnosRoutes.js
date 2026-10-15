@@ -1,7 +1,5 @@
-const express = require("express");
-const router = express.Router();
-
-const {
+import express from "express";
+import {
   obtenerTurnos,
   obtenerTurnoPorId,
   crearTurno,
@@ -11,8 +9,9 @@ const {
   eliminarTurno,
   obtenerTurnosPorPaciente,
   obtenerAgendaProfesional
-} = require("../controllers/turnosController");
+} from '../controllers/turnosController.js';
 
+const router = express.Router();
 
 router.get('/paciente/:pacienteId', obtenerTurnosPorPaciente);
 router.get('/profesional/:profesionalId', obtenerAgendaProfesional);
@@ -25,4 +24,4 @@ router.patch("/:id/cancelar", cancelarTurno);
 router.patch("/:id/atender", atenderTurno);
 router.delete("/:id", eliminarTurno);
 
-module.exports = router;
+export default router;

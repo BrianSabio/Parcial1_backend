@@ -1,16 +1,14 @@
-const express = require("express");
-const router = express.Router();
-
-const {
+import express from "express";
+import {
   obtenerServicios,
   obtenerServicioById,
   crearServicio,
   actualizarServicio,
   eliminarServicio,
   obtenerEstadoPaquetePaciente
-} = require("../controllers/serviciosController");
+} from '../controllers/serviciosController.js';
 
-
+const router = express.Router();
 
 router.get("/", obtenerServicios);
 router.get("/:id", obtenerServicioById);
@@ -20,4 +18,4 @@ router.delete("/:id", eliminarServicio);
 // Consulta 3
 router.get("/paciente/:pacienteId/estado", obtenerEstadoPaquetePaciente);
 
-module.exports = router;
+export default router;

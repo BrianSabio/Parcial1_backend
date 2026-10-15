@@ -1,13 +1,13 @@
-const express = require("express");
-const router = express.Router();
-
-const {
+import express from "express";
+import {
   obtenerProfesionales,
   obtenerProfesionalPorId,
   crearProfesional,
   actualizarProfesional,
   eliminarProfesional
-} = require("../controllers/profesionalesController");
+} from '../controllers/profesionalesController.js';
+
+const router = express.Router();
 
 router.get("/", obtenerProfesionales);
 router.get("/:id", obtenerProfesionalPorId);
@@ -15,4 +15,4 @@ router.post("/", crearProfesional);
 router.put("/:id", actualizarProfesional);
 router.delete("/:id", eliminarProfesional);
 
-module.exports = router;
+export default router;
