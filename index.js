@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import conectarDB from './config/db.js';
 
 // Importación de rutas
+import loginRoutes from './routes/loginRoutes.js';
 import pacientesRoutes from './routes/pacientesRoutes.js';
 import profesionalesRoutes from './routes/profesionalesRoutes.js';
 import disponibilidadRoutes from './routes/disponibilidadRoutes.js';
@@ -27,10 +28,18 @@ const PORT = 3000;
 app.set("views", "./views");
 app.set("view engine", "pug");
 
-// Parseo de JSON en el body
+// Middlewares para lectura del body 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Middleware para ver el usuario en todas las vistas de Pug
+app.use((req, res, next) => {
+res.locals.usuarioLogueado = req.session?.usuario || null; 
+  next();
+});
 
 // Montaje de rutas de la API
+app.use("/login", loginRoutes);
 app.use("/pacientes", pacientesRoutes);
 app.use("/profesionales", profesionalesRoutes);
 app.use("/disponibilidad", disponibilidadRoutes);
