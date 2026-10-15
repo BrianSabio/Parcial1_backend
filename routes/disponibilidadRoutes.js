@@ -1,13 +1,13 @@
-const express = require("express");
-const router = express.Router();
-
-const {
+import express from 'express';
+import {
   obtenerDisponibilidades,
   obtenerDisponibilidadById,
   crearDisponibilidad,
   actualizarDisponibilidad,
   eliminarDisponibilidad
-} = require("../controllers/disponibilidadController");
+} from '../controllers/disponibilidadController.js';
+
+const router = express.Router();
 
 router.get("/", obtenerDisponibilidades);
 router.get("/:id", obtenerDisponibilidadById);
@@ -15,4 +15,4 @@ router.post("/", crearDisponibilidad);
 router.put("/:id", actualizarDisponibilidad);
 router.delete("/:id", eliminarDisponibilidad);
 
-module.exports = router;
+export default router;
