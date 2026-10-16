@@ -101,3 +101,12 @@ export const existeProfesional = async (profesionalId) => {
   const profesional = await Profesional.findById(profesionalId);
   return Boolean(profesional);
 };
+
+export const mostrarVistaProfesionales = async (req, res, next) => {
+  try {
+    const profesionales = await Profesional.find();
+    res.render('profesionales', { title: 'Gestión de Profesionales', profesionales });
+  } catch (error) {
+    next(error);
+  }
+};

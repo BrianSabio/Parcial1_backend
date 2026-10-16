@@ -1,0 +1,45 @@
+extends layout
+
+block content
+  .contenedor-pacientes
+    h2 Gestión de Pacientes
+
+    .formulario-paciente
+      h3 Agregar Paciente
+      form#formPaciente
+        .form-group
+          label(for="nombre") Nombre:
+          input#nombre(type="text", name="nombre", required=true)
+
+        .form-group
+          label(for="apellido") Apellido:
+          input#apellido(type="text", name="apellido", required=true)
+
+        .form-group
+          label(for="dni") DNI:
+          input#dni(type="text", name="dni", required=true)
+
+        .form-group
+          label(for="telefono") Teléfono:
+          input#telefono(type="text", name="telefono")
+
+        .form-group
+          label(for="email") Email:
+          input#email(type="email", name="email")
+
+        button(type="submit") Guardar Paciente
+
+    p.vacio#sinPacientes No hay pacientes registrados todavía.
+
+    table.listado#tablaPacientes
+      thead
+        tr
+          th Nombre
+          th Apellido
+          th DNI
+          th Teléfono
+          th Email
+          th Acciones
+      tbody#cuerpoTablaPacientes
+
+  script(src="/js/pacientes.js")

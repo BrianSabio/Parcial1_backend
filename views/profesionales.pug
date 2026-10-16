@@ -1,0 +1,27 @@
+extends layout
+
+block content
+  .contenedor-profesionales
+    h2 Gestión de Profesionales
+
+    .formulario-profesional
+      h3 Agregar Profesional
+      form#formProfesional
+        .form-group
+          label(for="nombre") Nombre:
+          input#nombre(type="text", name="nombre", required=true)
+
+        .form-group
+          label(for="apellido") Apellido:
+          input#apellido(type="text", name="apellido", required=true)
+
+        .form-group
+          label(for="especialidad") Especialidad:
+          input#especialidad(type="text", name="especialidad", required=true)
+
+        button(type="submit") Guardar Profesional
+
+    div#contenedorTabla
+      p.vacio#sinProfesionales No hay profesionales registrados todavía.
+
+  script(src="/js/profesionales.js")

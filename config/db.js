@@ -6,7 +6,7 @@ const conectarDB = async () => {
         console.log('Conectado a la base de datos MongoDB (CIKIRE)');
     } catch (error) {
         console.error('Error de conexión a MongoDB:', error.message);
-        process.exit(1); // Detiene la app si falla la conexión
+        process.exit(1);
     }
 };
 

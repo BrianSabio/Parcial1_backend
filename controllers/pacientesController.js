@@ -70,7 +70,7 @@ export const actualizarPaciente = async (req, res, next) => {
     const { id } = req.params;
     const { dni } = req.body;
 
-    // Si se actualiza el DNI, validar que no pertenezca a otro paciente
+    // Validar DNI duplicado
     if (dni) {
       const dniEnUso = await Paciente.findOne({ dni, _id: { $ne: id } });
       if (dniEnUso) {
@@ -121,4 +121,13 @@ export const eliminarPaciente = async (req, res, next) => {
 export const existePaciente = async (pacienteId) => {
   const paciente = await Paciente.findById(pacienteId);
   return Boolean(paciente);
+};
+
+export const mostrarVistaPacientes = async (req, res, next) => {
+  try {
+    const pacientes = await Paciente.find();
+    res.render('pacientes', { title: 'Gestión de Pacientes', pacientes });
+  } catch (error) {
+    next(error);
+  }
 };

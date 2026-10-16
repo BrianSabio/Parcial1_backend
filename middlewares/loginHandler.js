@@ -3,14 +3,14 @@ const esAutenticado = (req, res, next) => {
     return next();
   }
   
-  // Detectar si es una petición AJAX/fetch a API
+  // Responder según el tipo de solicitud
   if (req.headers['content-type']?.includes('application/json') || 
       req.headers['accept']?.includes('application/json') ||
       req.path.startsWith('/api/')) {
     return res.status(401).json({ mensaje: 'No autenticado' });
   }
   
-  // Para vistas HTML, redirigir al login
+  // Redirigir las vistas al login
   return res.redirect('/login');
 };
 
@@ -18,7 +18,7 @@ const esAutenticado = (req, res, next) => {
 const permitirRoles = (...rolesPermitidos) => {
   return (req, res, next) => {
     if (!req.session || !req.session.usuario) {
-      // Detectar si es una petición AJAX/fetch a API
+      // Responder según el tipo de solicitud
       if (req.headers['content-type']?.includes('application/json') || 
           req.headers['accept']?.includes('application/json') ||
           req.path.startsWith('/api/')) {
@@ -27,11 +27,11 @@ const permitirRoles = (...rolesPermitidos) => {
       return res.redirect('/login');
     }
 
-    if (rolesPermitidos.includes(req.session.usuario.tipo)) {
+    if (rolesPermitidos.includes(req.session.usuario.rol)) {
       return next();
     }
 
-    // Para APIs, responder con JSON
+    // Responder con JSON para la API
     if (req.headers['content-type']?.includes('application/json') || 
         req.headers['accept']?.includes('application/json') ||
         req.path.startsWith('/api/')) {

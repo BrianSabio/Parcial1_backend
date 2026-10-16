@@ -1,29 +1,33 @@
 # Estructura de carpetas
 
-MVC para API REST con persistencia en JSON utilizando PUG
-
-Persistencia síncrona (`fs.readFileSync` / `fs.writeFileSync`).
+MVC para API REST con persistencia en MongoDB utilizando PUG
 
 ```
 Proyecto/
 ├── package.json                    # Configuración del proyecto y dependencias
 ├── index.js                        # Punto de entrada y servidor Express
 │
-├── models/                         # Clases POO
+├── config/
+│   └── db.js                       # Conexión con MongoDB
+│
+├── models/                         # Esquemas de Mongoose
 │   ├── Paciente.js
 │   ├── Profesional.js
 │   ├── Disponibilidad.js
 │   ├── Servicio.js
-│   └── Turno.js
+│   ├── Turno.js
+│   └── Usuario.js
 │
 ├── controllers/                    # Lógica de negocio / manejo de req-res
 │   ├── pacientesController.js
 │   ├── profesionalesController.js
 │   ├── disponibilidadController.js
 │   ├── serviciosController.js
-│   └── turnosController.js
+│   ├── turnosController.js
+│   └── loginController.js
 │
 ├── routes/                         # Definición de rutas Express
+│   ├── loginRoutes.js
 │   ├── pacientesRoutes.js
 │   ├── profesionalesRoutes.js
 │   ├── disponibilidadRoutes.js
@@ -31,26 +35,29 @@ Proyecto/
 │   └── turnosRoutes.js
 │
 ├── middlewares/
-│   └── errorHandler.js             # Middleware propio (manejo de errores)
+│   ├── errorHandler.js             # Manejo de errores
+│   └── loginHandler.js             # Autenticación y autorización
 │
-├── views/                          # Pug
+├── views/                          # Plantillas Pug
 │   ├── turnos.pug
+│   ├── pacientes.pug
+│   ├── profesionales.pug
+│   ├── login.pug
 │   └── layout.pug
 │
-└── data/                           # Persistencia en JSON
-    ├── pacientes.json
-    ├── profesionales.json
-    ├── disponibilidad.json
-    ├── servicios.json
-    └── turnos.json
+└── public/
+    └── js/                         # Scripts del cliente
+        ├── login.js
+        ├── pacientes.js
+        └── profesionales.js
 ```
 
-El proyecto sigue una estructura modular de tipo MVC, adaptada para una API REST con persistencia en archivos JSON.
+El proyecto sigue una estructura modular de tipo MVC, adaptada para una API REST con persistencia en MongoDB.
  
-- **`index.js`**: punto de entrada de la aplicación. Configura Express, habilita el parseo de JSON en las solicitudes y monta las rutas de cada entidad.
-- **`models/`**: define las clases de cada entidad del sistema (Paciente, Profesional, Disponibilidad, Servicio, Turno), estableciendo la estructura de datos que maneja la aplicación.
-- **`controllers/`**: concentra la lógica de negocio de cada entidad, incluyendo la lectura y escritura síncrona sobre los archivos JSON de `data/` y la validación de las reglas propias del dominio (por ejemplo, evitar la superposición de turnos).
-- **`routes/`**: define los endpoints REST de cada entidad (GET, POST, PUT, DELETE) y delega la ejecución en su controller correspondiente.
-- **`middlewares/`**: contiene el middleware propio del proyecto, en este caso `errorHandler.js`, encargado de centralizar el manejo de errores de la API.
-- **`views/`**: contiene las plantillas Pug utilizadas para la visualización de turnos (listado y layout general).
-- **`data/`**: almacena los archivos JSON que funcionan como base de datos persistente de cada entidad.
+- **`index.js`**: punto de entrada de la aplicación. Configura Express, las sesiones, las vistas y monta las rutas de API y de vistas.
+- **`models/`**: define los esquemas de Mongoose de cada entidad del sistema.
+- **`controllers/`**: concentra la lógica de negocio de cada entidad, la autenticación, las vistas `mostrarVistaPacientes` y `mostrarVistaProfesionales`, y la validación de las reglas propias del dominio.
+- **`routes/`**: define los endpoints REST y las rutas de autenticación, y delega la ejecución en su controller correspondiente.
+- **`middlewares/`**: contiene los middlewares de autenticación, autorización y manejo de errores.
+- **`views/`**: contiene las plantillas Pug utilizadas para el login y la gestión de turnos, pacientes y profesionales.
+- **`public/`**: contiene los scripts del cliente para el login y las tablas dinámicas.

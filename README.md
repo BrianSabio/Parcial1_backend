@@ -13,30 +13,30 @@ Proyecto desarrollado de forma colaborativa por:
 
 ## ¿Qué resuelve?
 
-Actualmente las reservas se manejan de forma informal (planillas, WhatsApp), lo que genera turnos duplicados, errores de horario y dificultad para cancelar o consultar reservas. Este sistema digitaliza el proceso de gestión de reservas: recepción de la solicitud, verificación de disponibilidad del profesional y asignación del turno.
+Actualmente las reservas se manejan de forma informal (planillas, WhatsApp), lo que genera turnos duplicados, errores de horario y dificultad para cancelar o consultar reservas. Este sistema digitaliza el proceso de gestión de reservas: recepción de la solicitud, verificación de disponibilidad del profesional y asignación del turno. También incluye tablas dinámicas para la gestión de pacientes y profesionales.
 
 ## Tecnologías
 
 - Node.js + Express
-- Persistencia en archivos JSON (sin base de datos y sin ORM por ahora)
+- Persistencia en MongoDB con Mongoose
 - Pug como motor de plantillas
-- Programación Orientada a Objetos (POO)
+- Sesiones con express-session
 
 ## Arquitectura
 
-El proyecto sigue una estructura MVC adaptada, con persistencia **síncrona** en JSON:
+El proyecto sigue una estructura MVC adaptada, con persistencia en MongoDB:
 
 ```
 proyecto/
 ├── models/         # Clases POO simples (solo constructor)
-├── controllers/     # Lógica de negocio + lectura/escritura de los JSON
+├── controllers/     # Lógica de negocio y validaciones
 ├── routes/           # Endpoints Express, delegan en los controllers
-├── middlewares/      # Middleware propio (manejo de errores)
+├── middlewares/      # Middlewares de autenticación y manejo de errores
 ├── views/            # Plantillas Pug
-└── data/             # Archivos JSON (persistencia)
+└── public/           # Scripts del cliente
 ```
 
-**Regla de diseño**: los models no saben persistirse a sí mismos. Toda la lectura/escritura de archivos y las reglas de negocio viven en los controllers.
+**Regla de diseño**: los models definen los esquemas de datos. La persistencia y las reglas de negocio viven en los controllers.
 
 ## Entidades
 
@@ -56,7 +56,7 @@ proyecto/
 
 ## Identificadores
 
-Todos los ids se generan con `crypto.randomUUID()` (nativo de Node) y son de tipo `string` en todas las entidades, incluidas las relaciones (`pacienteId`, `profesionalId`, `servicioId`).
+Los ids son generados y administrados por MongoDB mediante ObjectId, incluidas las relaciones (`pacienteId`, `profesionalId`, `servicioId`).
 
 ## Instalación
 
@@ -77,16 +77,16 @@ El servidor levanta por defecto en el puerto `3000`.
 
 | Entidad | Endpoints |
 |---|---|
-| Pacientes | `GET /pacientes`, `GET /pacientes/:id`, `POST /pacientes`, `PUT /pacientes/:id`, `DELETE /pacientes/:id` |
-| Profesionales | `GET /profesionales`, `GET /profesionales/:id`, `POST /profesionales`, `PUT /profesionales/:id`, `DELETE /profesionales/:id` |
-| Disponibilidad | `GET /disponibilidad`, `GET /disponibilidad/:id`, `POST /disponibilidad`, `PUT /disponibilidad/:id`, `DELETE /disponibilidad/:id` |
-| Servicios | `GET /servicios`, `GET /servicios/:id`, `POST /servicios`, `PUT /servicios/:id`, `DELETE /servicios/:id`, `GET /servicios/paciente/:pacienteId/estado` (consulta: sesiones totales/consumidas/restantes de un paciente) |
-| Turnos | `GET /turnos`, `GET /turnos/:id`, `POST /turnos`, `PUT /turnos/:id`, `PATCH /turnos/:id/cancelar`, `PATCH /turnos/:id/atender`, `DELETE /turnos/:id`, `GET /turnos/paciente/:pacienteId` (consulta: turnos de un paciente), `GET /turnos/profesional/:profesionalId` (consulta: agenda de un profesional) |
-| Vista | `GET /vista/turnos` (listado de turnos en Pug, con nombres de paciente y profesional ya resueltos) |
+| Pacientes | `GET /api/pacientes`, `GET /api/pacientes/:id`, `POST /api/pacientes`, `PUT /api/pacientes/:id`, `DELETE /api/pacientes/:id` |
+| Profesionales | `GET /api/profesionales`, `GET /api/profesionales/:id`, `POST /api/profesionales`, `PUT /api/profesionales/:id`, `DELETE /api/profesionales/:id` |
+| Disponibilidad | `GET /api/disponibilidad`, `GET /api/disponibilidad/:id`, `POST /api/disponibilidad`, `PUT /api/disponibilidad/:id`, `DELETE /api/disponibilidad/:id` |
+| Servicios | `GET /api/servicios`, `GET /api/servicios/:id`, `POST /api/servicios`, `PUT /api/servicios/:id`, `DELETE /api/servicios/:id`, `GET /api/servicios/estado/:pacienteId` (consulta: sesiones totales/consumidas/restantes de un paciente) |
+| Turnos | `GET /api/turnos`, `GET /api/turnos/:id`, `POST /api/turnos`, `PUT /api/turnos/:id`, `PATCH /api/turnos/:id/cancelar`, `PATCH /api/turnos/:id/atender`, `DELETE /api/turnos/:id`, `GET /api/turnos/paciente/:pacienteId` (consulta: turnos de un paciente), `GET /api/turnos/profesional/:profesionalId` (consulta: agenda de un profesional) |
+| Vista | `GET /vista/turnos`, `GET /vista/pacientes`, `GET /vista/profesionales` (vistas Pug de turnos, pacientes y profesionales) |
 
 ## Vista Pug
 
-`views/layout.pug` define la base común de la página (usa herencia de plantillas con `extends`/`block content`). `views/turnos.pug` extiende ese layout y muestra la tabla de turnos reservados, o un mensaje si todavía no hay ninguno cargado.
+`views/layout.pug` define la base común de la página (usa herencia de plantillas con `extends`/`block content`). `views/turnos.pug`, `views/pacientes.pug` y `views/profesionales.pug` extienden ese layout y muestran las tablas correspondientes.
 
 ## Pruebas
 
@@ -98,4 +98,4 @@ En la raíz de carpetas del sistema se encuentra una llamada "docs", en donde se
 
 ## Alcance
 
-No incluye interfaz gráfica completa, autenticación avanzada, integración con servicios externos ni base de datos MongoDB — esta entrega se limita a API REST + persistencia en JSON + lógica de negocio + validaciones + manejo de errores + consultas, según lo definido en la consigna.
+No incluye autenticación avanzada ni integración con servicios externos. Esta entrega se limita a API REST + persistencia en MongoDB + vistas Pug + lógica de negocio + validaciones + manejo de errores + consultas, según lo definido en la consigna.

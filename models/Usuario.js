@@ -7,7 +7,6 @@ const usuarioSchema = new mongoose.Schema({
     unique: true,
     trim: true
   },
-  //me gusta usar password para no usar la "ñ", pero si quieren cambiarlo, haganlo. Tener en cuenta que debe sincronizarse con los demás archivos.
   password: {
     type: String,
     required: true

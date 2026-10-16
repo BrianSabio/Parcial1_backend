@@ -1,4 +1,4 @@
-// Middleware de manejo centralizado de errores.
+// Manejo centralizado de errores
 
 function errorHandler(err, req, res, next) {
   console.error(err);

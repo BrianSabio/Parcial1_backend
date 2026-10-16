@@ -13,14 +13,12 @@ const router = express.Router();
 
 
 router.get("/", esAutenticado, permitirRoles('paciente', 'medico', 'administrativo'), obtenerServicios);
+router.get("/estado/:pacienteId", esAutenticado, permitirRoles('administrativo', 'paciente'), obtenerEstadoPaquetePaciente);
 router.get("/:id", esAutenticado, permitirRoles('paciente', 'medico', 'administrativo'), obtenerServicioById);
 
 
 router.post("/", esAutenticado, permitirRoles('administrativo'), crearServicio);
 router.put("/:id", esAutenticado, permitirRoles('administrativo'), actualizarServicio);
 router.delete("/:id", esAutenticado, permitirRoles('administrativo'), eliminarServicio);
-
-// Consulta 3
-router.get("/paciente/:pacienteId/estado", esAutenticado, permitirRoles('administrativo', 'paciente'), obtenerEstadoPaquetePaciente);
 
 export default router;
