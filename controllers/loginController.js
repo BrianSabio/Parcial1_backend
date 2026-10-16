@@ -21,8 +21,21 @@ export const autenticarUsuario = async (req, res, next) => {
       return res.status(401).json({ mensaje: 'Credenciales inválidas o usuario inactivo.' });
     }
 
+    // GUARDAR SESIÓN DEL USUARIO
+    req.session.usuario = usuarioEncontrado;
+    req.session.userId = usuarioEncontrado._id;
+    req.session.tipo = usuarioEncontrado.tipo;
 
-    res.status(200).json({ mensaje: 'Autenticación exitosa.', usuario: usuarioEncontrado });
+    // Guardar la sesión en el servidor
+    req.session.save((err) => {
+      if (err) return next(err);
+      
+      res.status(200).json({ 
+        mensaje: 'Autenticación exitosa.', 
+        usuario: usuarioEncontrado 
+      });
+    });
+
   } catch (error) {
     next(error);
   }

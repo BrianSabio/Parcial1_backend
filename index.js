@@ -1,6 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import conectarDB from './config/db.js';
+import session from 'express-session';
 
 // Importación de rutas
 import loginRoutes from './routes/loginRoutes.js';
@@ -13,7 +14,7 @@ import turnosRoutes from './routes/turnosRoutes.js';
 // Middleware propio
 import errorHandler from './middlewares/errorHandler.js';
 
-// Vista de turnos (Pug)
+// Vistas (Pug)
 import { mostrarVistaTurnos } from './controllers/turnosController.js';
 
 dotenv.config();
@@ -22,7 +23,7 @@ dotenv.config();
 conectarDB();
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Configuración de vistas (Pug)
 app.set("views", "./views");
@@ -36,21 +37,37 @@ app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Uso de express-session para configuración de sesiones
+// express-session mantiene la sesión del usuario logueado
+// en las peticiones subsecuentes sin recargar credenciales
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'cikire-secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { 
+    secure: false,
+    httpOnly: true,
+    maxAge: 3600000
+  }
+}));
+
 // Middleware para ver el usuario en todas las vistas de Pug
 app.use((req, res, next) => {
-res.locals.usuarioLogueado = req.session?.usuario || null; 
+  res.locals.usuarioLogueado = req.session?.usuario || null;
   next();
 });
 
-// Montaje de rutas de la API
+// RUTAS DE AUTENTICACIÓN
 app.use("/login", loginRoutes);
-app.use("/pacientes", pacientesRoutes);
-app.use("/profesionales", profesionalesRoutes);
-app.use("/disponibilidad", disponibilidadRoutes);
-app.use("/servicios", serviciosRoutes);
-app.use("/turnos", turnosRoutes);
 
-// Vista Pug
+// RUTAS DE API (devuelven JSON)
+app.use("/api/pacientes", pacientesRoutes);
+app.use("/api/profesionales", profesionalesRoutes);
+app.use("/api/disponibilidad", disponibilidadRoutes);
+app.use("/api/servicios", serviciosRoutes);
+app.use("/api/turnos", turnosRoutes);
+
+// RUTAS DE VISTAS (renderizan Pug)
 app.get("/vista/turnos", mostrarVistaTurnos);
 
 // Middleware de manejo de errores
