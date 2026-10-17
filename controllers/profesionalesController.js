@@ -1,6 +1,5 @@
 import Profesional from '../models/Profesional.js';
 
-
 export const obtenerProfesionales = async (req, res, next) => {
   try {
     const profesionales = await Profesional.find();
@@ -9,7 +8,6 @@ export const obtenerProfesionales = async (req, res, next) => {
     next(error);
   }
 };
-
 
 export const obtenerProfesionalPorId = async (req, res, next) => {
   try {
@@ -53,7 +51,6 @@ export const crearProfesional = async (req, res, next) => {
   }
 };
 
-
 export const actualizarProfesional = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -77,7 +74,6 @@ export const actualizarProfesional = async (req, res, next) => {
   }
 };
 
-
 export const eliminarProfesional = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -95,7 +91,6 @@ export const eliminarProfesional = async (req, res, next) => {
     next(error);
   }
 };
-
 
 export const existeProfesional = async (profesionalId) => {
   const profesional = await Profesional.findById(profesionalId);

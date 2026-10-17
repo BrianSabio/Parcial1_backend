@@ -1,6 +1,5 @@
 import Servicio from '../models/Servicio.js';
 
-
 export const obtenerServicios = async (req, res, next) => {
   try {
     const servicios = await Servicio.find()
@@ -28,7 +27,6 @@ export const obtenerServicioById = async (req, res, next) => {
   }
 };
 
-
 export const crearServicio = async (req, res, next) => {
   try {
     const { pacienteId, tipo, sesionesTotales } = req.body;
@@ -54,7 +52,6 @@ export const crearServicio = async (req, res, next) => {
   }
 };
 
-
 export const actualizarServicio = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -75,7 +72,6 @@ export const actualizarServicio = async (req, res, next) => {
   }
 };
 
-
 export const eliminarServicio = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -94,7 +90,6 @@ export const eliminarServicio = async (req, res, next) => {
     next(error);
   }
 };
-
 
 export const obtenerEstadoPaquetePaciente = async (req, res, next) => {
   try {

@@ -1,0 +1,40 @@
+doctype html
+html(lang="es")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title Registro - CIKIRE
+  body
+    .login-container
+      h2 Crear Nuevo Usuario
+      p.alert-error#mensajeError
+      p.alert-success#mensajeExito
+      
+      form#formRegistro
+        .form-group
+          label(for="nombre") Nombre:
+          input#nombre(type="text", required=true)
+        .form-group
+          label(for="apellido") Apellido:
+          input#apellido(type="text", required=true)
+        .form-group
+          label(for="usuario") Nombre de Usuario:
+          input#usuario(type="text", required=true)
+        .form-group
+          label(for="password") Contraseña:
+          input#password(type="password", required=true)
+        .form-group
+          label(for="rol") Rol:
+          select#rol(required=true)
+            option(value="paciente") Paciente
+            option(value="recepcionista") Recepcionista
+            option(value="profesional") Profesional
+            option(value="administrativo") Administrativo
+            option(value="coordinador") Coordinador
+            option(value="director") Director
+        
+        button(type="submit") Registrarse
+      
+      p ¿Ya tenés usuario? 
+        a(href="/login") Iniciá Sesión
+    script(src="/js/registro.js")

@@ -42,7 +42,6 @@ export const crearDisponibilidad = async (req, res, next) => {
     if (!profesionalId || !fecha || !horaInicio || !horaFin) {
       return res.status(400).json({ mensaje: 'Faltan campos obligatorios' });
     }
-
    
     const conflicto = await Disponibilidad.findOne({
       profesionalId,
@@ -75,7 +74,6 @@ export const crearDisponibilidad = async (req, res, next) => {
   }
 };
 
-
 export const actualizarDisponibilidad = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -95,7 +93,6 @@ export const actualizarDisponibilidad = async (req, res, next) => {
     next(error);
   }
 };
-
 
 export const eliminarDisponibilidad = async (req, res, next) => {
   try {

@@ -44,7 +44,6 @@ export const crearTurno = async (req, res, next) => {
       });
     }
 
-    
     const servicio = await Servicio.findOne({ _id: servicioId, pacienteId });
 
     if (!servicio) {
@@ -59,7 +58,6 @@ export const crearTurno = async (req, res, next) => {
       });
     }
 
-    
     const estaDisponible = await Disponibilidad.findOne({
       profesionalId,
       fecha,
@@ -74,7 +72,6 @@ export const crearTurno = async (req, res, next) => {
       });
     }
 
-    
     const turnoOcupado = await Turno.findOne({
       profesionalId,
       fecha,
@@ -88,7 +85,6 @@ export const crearTurno = async (req, res, next) => {
       });
     }
 
-   
     const nuevoTurno = new Turno({
       pacienteId,
       profesionalId,
@@ -108,7 +104,6 @@ export const crearTurno = async (req, res, next) => {
     next(error);
   }
 };
-
 
 export const cancelarTurno = async (req, res, next) => {
   try {
@@ -141,7 +136,6 @@ export const cancelarTurno = async (req, res, next) => {
     next(error);
   }
 };
-
 
 export const atenderTurno = async (req, res, next) => {
   try {
