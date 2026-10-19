@@ -26,8 +26,8 @@ const turnoSchema = new mongoose.Schema({
   },
   estado: {
     type: String,
-    enum: ['Reservado', 'Confirmado', 'Cancelado', 'Atendido'],
-    default: 'Reservado'
+    enum: ['reservado', 'confirmado', 'cancelado', 'atendido'],
+    default: 'reservado'
   }
 }, {
   timestamps: true
