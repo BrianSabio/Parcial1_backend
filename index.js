@@ -1,7 +1,9 @@
 import express from 'express';
+import http from 'http';
 import dotenv from 'dotenv';
 import conectarDB from './config/db.js';
 import cookieParser from 'cookie-parser';
+import { inicializarSocket } from './config/socket.js';
 
 // Importación de rutas
 import loginRoutes from './routes/loginRoutes.js';
@@ -27,6 +29,10 @@ conectarDB();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Configuración del servidor HTTP y WebSockets
+const server = http.createServer(app);
+inicializarSocket(server);
 
 // Configuración de vistas
 app.set("views", "./views");
@@ -66,6 +72,6 @@ app.get("/vista/profesionales", esAutenticado, mostrarVistaProfesionales);
 app.use(errorHandler);
 
 // Arranque del servidor
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log("Servidor CIKIRE corriendo en puerto " + PORT);
 });
