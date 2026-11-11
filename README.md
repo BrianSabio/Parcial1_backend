@@ -20,7 +20,8 @@ Actualmente las reservas se manejan de forma informal (planillas, WhatsApp), lo 
 - Node.js + Express
 - Persistencia en MongoDB con Mongoose
 - Pug como motor de plantillas
-- Sesiones con express-session
+- Autenticación con JWT en cookies `HttpOnly`
+- Contraseñas protegidas con `bcrypt`
 
 ## Arquitectura
 
@@ -32,8 +33,11 @@ proyecto/
 ├── controllers/     # Lógica de negocio y validaciones
 ├── routes/           # Endpoints Express, delegan en los controllers
 ├── middlewares/      # Middlewares de autenticación y manejo de errores
+├── config/           # Configuración de la conexión a MongoDB
+├── utils/            # Utilidades, incluyendo JWT
 ├── views/            # Plantillas Pug
-└── public/           # Scripts del cliente
+├── public/           # Scripts del cliente
+└── docs/             # Documentación y diagramas del proyecto
 ```
 
 **Regla de diseño**: los models definen los esquemas de datos. La persistencia y las reglas de negocio viven en los controllers.
@@ -64,6 +68,13 @@ Los ids son generados y administrados por MongoDB mediante ObjectId, incluidas l
 npm install
 ```
 
+Copiar `.env.example` como `.env` y configurar al menos `MONGODB_URI`, `JWT_SECRET` y
+`JWT_EXPIRES_IN`.
+
+> **Advertencia:** el registro público permite seleccionar cualquiera de los roles
+> definidos por el modelo. En un entorno real, la creación de usuarios con roles
+> privilegiados debería restringirse a usuarios autorizados.
+
 ## Ejecución
 
 ```bash
@@ -72,6 +83,34 @@ npm start       # sin nodemon
 ```
 
 El servidor levanta por defecto en el puerto `3000`.
+
+## Autenticación y autorización
+
+El sistema utiliza JWT para autenticar a los usuarios. Después de validar las
+credenciales, el servidor genera un token firmado y lo envía en una cookie
+`HttpOnly`. En cada solicitud protegida, el middleware valida el token y carga el
+usuario autenticado en `req.usuario`.
+
+El acceso a las operaciones se controla mediante roles. Las rutas aplican primero
+el middleware de autenticación y luego verifican los roles permitidos:
+
+- `paciente`: puede consultar profesionales, disponibilidades, servicios y
+  gestionar sus turnos.
+- `profesional`: puede consultar pacientes, profesionales, disponibilidades,
+  servicios y turnos, y puede atender turnos.
+- `administrativo`: puede gestionar pacientes, profesionales, disponibilidades,
+  servicios y turnos.
+- `recepcionista`, `coordinador` y `director`: están definidos en el modelo de
+  usuario, pero deben recibir permisos explícitos en las rutas si se requieren.
+
+Las contraseñas nuevas se almacenan mediante `bcrypt`. Las contraseñas antiguas
+en texto plano se convierten automáticamente a un hash seguro cuando el usuario
+inicia sesión correctamente.
+
+Al cerrar sesión, el servidor envía una instrucción para eliminar la cookie JWT
+del navegador y redirige al login. Como los JWT son autocontenidos, un token
+copiado por un tercero seguiría siendo válido hasta su vencimiento; este proyecto
+no implementa una lista de revocación ni refresh tokens.
 
 ## Endpoints principales
 
@@ -98,4 +137,8 @@ En la raíz de carpetas del sistema se encuentra una llamada "docs", en donde se
 
 ## Alcance
 
-No incluye autenticación avanzada ni integración con servicios externos. Esta entrega incluye API REST, persistencia en MongoDB, vistas dinámicas con Pug y Fetch, validaciones de negocio, y un sistema de autenticación con sesiones (express-session) y control de accesos basado en roles.
+El proyecto ofrece una solución integral para la gestión de pacientes,
+profesionales, disponibilidades, servicios y turnos. Incluye una API REST con
+persistencia en MongoDB, vistas dinámicas con Pug y Fetch, validaciones de las
+reglas principales del negocio, autenticación con JWT mediante cookies `HttpOnly`,
+contraseñas protegidas con `bcrypt` y control de accesos basado en roles.

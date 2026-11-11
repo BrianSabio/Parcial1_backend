@@ -12,9 +12,9 @@ import { esAutenticado, permitirRoles } from '../middlewares/loginHandler.js';
 const router = express.Router();
 
 
-router.get("/", esAutenticado, permitirRoles('paciente', 'medico', 'administrativo'), obtenerServicios);
+router.get("/", esAutenticado, permitirRoles('paciente', 'profesional', 'administrativo'), obtenerServicios);
 router.get("/estado/:pacienteId", esAutenticado, permitirRoles('administrativo', 'paciente'), obtenerEstadoPaquetePaciente);
-router.get("/:id", esAutenticado, permitirRoles('paciente', 'medico', 'administrativo'), obtenerServicioById);
+router.get("/:id", esAutenticado, permitirRoles('paciente', 'profesional', 'administrativo'), obtenerServicioById);
 
 
 router.post("/", esAutenticado, permitirRoles('administrativo'), crearServicio);
