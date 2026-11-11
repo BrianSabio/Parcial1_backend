@@ -33,8 +33,11 @@ proyecto/
 ├── controllers/     # Lógica de negocio y validaciones
 ├── routes/           # Endpoints Express, delegan en los controllers
 ├── middlewares/      # Middlewares de autenticación y manejo de errores
+├── config/           # Configuración de la conexión a MongoDB
+├── utils/            # Utilidades, incluyendo JWT
 ├── views/            # Plantillas Pug
-└── public/           # Scripts del cliente
+├── public/           # Scripts del cliente
+└── docs/             # Documentación y diagramas del proyecto
 ```
 
 **Regla de diseño**: los models definen los esquemas de datos. La persistencia y las reglas de negocio viven en los controllers.
@@ -94,7 +97,7 @@ el middleware de autenticación y luego verifican los roles permitidos:
 - `paciente`: puede consultar profesionales, disponibilidades, servicios y
   gestionar sus turnos.
 - `profesional`: puede consultar pacientes, profesionales, disponibilidades,
-  servicios y gestionar o atender turnos según la operación.
+  servicios y turnos, y puede atender turnos.
 - `administrativo`: puede gestionar pacientes, profesionales, disponibilidades,
   servicios y turnos.
 - `recepcionista`, `coordinador` y `director`: están definidos en el modelo de
@@ -103,6 +106,11 @@ el middleware de autenticación y luego verifican los roles permitidos:
 Las contraseñas nuevas se almacenan mediante `bcrypt`. Las contraseñas antiguas
 en texto plano se convierten automáticamente a un hash seguro cuando el usuario
 inicia sesión correctamente.
+
+Al cerrar sesión, el servidor envía una instrucción para eliminar la cookie JWT
+del navegador y redirige al login. Como los JWT son autocontenidos, un token
+copiado por un tercero seguiría siendo válido hasta su vencimiento; este proyecto
+no implementa una lista de revocación ni refresh tokens.
 
 ## Endpoints principales
 
@@ -129,7 +137,8 @@ En la raíz de carpetas del sistema se encuentra una llamada "docs", en donde se
 
 ## Alcance
 
-No incluye integración con servicios externos ni administración de refresh tokens o
-revocación de JWT. Esta entrega incluye API REST, persistencia en MongoDB, vistas
-dinámicas con Pug y Fetch, validaciones de negocio, autenticación con JWT y
-control de accesos basado en roles.
+El proyecto ofrece una solución integral para la gestión de pacientes,
+profesionales, disponibilidades, servicios y turnos. Incluye una API REST con
+persistencia en MongoDB, vistas dinámicas con Pug y Fetch, validaciones de las
+reglas principales del negocio, autenticación con JWT mediante cookies `HttpOnly`,
+contraseñas protegidas con `bcrypt` y control de accesos basado en roles.

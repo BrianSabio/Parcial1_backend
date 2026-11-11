@@ -38,26 +38,32 @@ Proyecto/
 │   ├── errorHandler.js             # Manejo de errores
 │   └── loginHandler.js             # Autenticación y autorización
 │
+├── utils/
+│   └── jwt.js                      # Generación y verificación de JWT
+│
 ├── views/                          # Plantillas Pug
 │   ├── turnos.pug
 │   ├── pacientes.pug
 │   ├── profesionales.pug
 │   ├── login.pug
+│   ├── registro.pug
 │   └── layout.pug
 │
 └── public/
     └── js/                         # Scripts del cliente
         ├── login.js
+        ├── registro.js
         ├── pacientes.js
         └── profesionales.js
 ```
 
 El proyecto sigue una estructura modular de tipo MVC, adaptada para una API REST con persistencia en MongoDB.
  
-- **`index.js`**: punto de entrada de la aplicación. Configura Express, las sesiones, las vistas y monta las rutas de API y de vistas.
+- **`index.js`**: punto de entrada de la aplicación. Configura Express, las cookies, las vistas y monta las rutas de API y de vistas.
 - **`models/`**: define los esquemas de Mongoose de cada entidad del sistema.
 - **`controllers/`**: concentra la lógica de negocio de cada entidad, la autenticación, las vistas `mostrarVistaPacientes` y `mostrarVistaProfesionales`, y la validación de las reglas propias del dominio.
 - **`routes/`**: define los endpoints REST y las rutas de autenticación, y delega la ejecución en su controller correspondiente.
-- **`middlewares/`**: contiene los middlewares de autenticación, autorización y manejo de errores.
+- **`middlewares/`**: contiene los middlewares de autenticación JWT, autorización por roles y manejo de errores.
+- **`utils/`**: contiene utilidades reutilizables, como la generación y verificación de JWT.
 - **`views/`**: contiene las plantillas Pug utilizadas para el login y la gestión de turnos, pacientes y profesionales.
 - **`public/`**: contiene los scripts del cliente para el login y las tablas dinámicas.
