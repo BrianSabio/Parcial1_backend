@@ -1,4 +1,5 @@
 import Usuario from '../models/Usuario.js';
+import bcrypt from 'bcrypt';
 
 
 export const mostrarLogin = (req, res) => {
@@ -21,11 +22,28 @@ export const autenticarUsuario = async (req, res, next) => {
       .populate('pacienteRef')
       .populate('profesionalRef');
 
-    if (!usuarioEncontrado || usuarioEncontrado.password !== password) {
+    if (!usuarioEncontrado) {
       return res.status(401).json({ mensaje: 'Usuario o contraseña incorrectos o cuenta inactiva.' });
     }
 
-    req.session.usuario = usuarioEncontrado;
+    const esHashBcrypt = /^\$2[aby]\$\d{2}\$/.test(usuarioEncontrado.password);
+    const passwordValida = esHashBcrypt
+      ? await bcrypt.compare(password, usuarioEncontrado.password)
+      : usuarioEncontrado.password === password;
+
+    if (!passwordValida) {
+      return res.status(401).json({ mensaje: 'Usuario o contraseña incorrectos o cuenta inactiva.' });
+    }
+
+    if (!esHashBcrypt) {
+      usuarioEncontrado.password = await bcrypt.hash(password, 10);
+      await usuarioEncontrado.save();
+    }
+
+    const usuarioSesion = usuarioEncontrado.toObject();
+    delete usuarioSesion.password;
+
+    req.session.usuario = usuarioSesion;
     req.session.userId = usuarioEncontrado._id;
 
     req.session.save((err) => {
@@ -33,7 +51,7 @@ export const autenticarUsuario = async (req, res, next) => {
       
       res.status(200).json({ 
         mensaje: 'Autenticación exitosa.', 
-        usuario: usuarioEncontrado 
+        usuario: usuarioSesion
       });
     });
 
@@ -51,10 +69,24 @@ export const registrarUsuario = async (req, res, next) => {
       return res.status(400).json({ mensaje: 'El nombre de usuario ya está en uso.' });
     }
 
-    const nuevoUsuario = new Usuario({nombre, apellido, usuario, password, rol, estado});
+    const passwordHash = await bcrypt.hash(password, 10);
+    const nuevoUsuario = new Usuario({
+      nombre,
+      apellido,
+      usuario,
+      password: passwordHash,
+      rol,
+      estado
+    });
     await nuevoUsuario.save();
 
-    return res.status(201).json({ mensaje: 'Usuario registrado correctamente.', usuario: nuevoUsuario });
+    const usuarioRegistrado = nuevoUsuario.toObject();
+    delete usuarioRegistrado.password;
+
+    return res.status(201).json({
+      mensaje: 'Usuario registrado correctamente.',
+      usuario: usuarioRegistrado
+    });
   } catch (error) {
     next(error);
   }
