@@ -44,24 +44,17 @@ export const autenticarUsuario = async (req, res, next) => {
     const usuarioSesion = usuarioEncontrado.toObject();
     delete usuarioSesion.password;
 
-    req.session.usuario = usuarioSesion;
-    req.session.userId = usuarioEncontrado._id;
+    const token = crearToken(usuarioEncontrado);
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 1000
+    });
 
-    req.session.save((err) => {
-      if (err) return next(err);
-
-      const token = crearToken(usuarioEncontrado);
-      res.cookie('token', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 60 * 60 * 1000
-      });
-      
-      res.status(200).json({ 
-        mensaje: 'Autenticación exitosa.', 
-        usuario: usuarioSesion
-      });
+    res.status(200).json({
+      mensaje: 'Autenticación exitosa.',
+      usuario: usuarioSesion
     });
 
   } catch (error) {
@@ -101,15 +94,7 @@ export const registrarUsuario = async (req, res, next) => {
   }
 };
 
-export const cerrarSesion = (req, res, next) => {
+export const cerrarSesion = (req, res) => {
   res.clearCookie('token');
-
-  if (req.session) {
-    req.session.destroy((err) => {
-      if (err) return next(err);
-      res.redirect('/login');
-    });
-  } else {
-    res.redirect('/login');
-  }
+  res.redirect('/login');
 };

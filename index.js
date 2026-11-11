@@ -1,7 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import conectarDB from './config/db.js';
-import session from 'express-session';
 import cookieParser from 'cookie-parser';
 
 // Importación de rutas
@@ -40,18 +39,6 @@ app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-
-// Configuración de sesiones
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'cikire-secret',
-  resave: false,
-  saveUninitialized: false,
-  cookie: { 
-    secure: false,
-    httpOnly: true,
-    maxAge: 3600000
-  }
-}));
 
 // Usuario disponible en las vistas
 app.use(cargarUsuarioOpcional);

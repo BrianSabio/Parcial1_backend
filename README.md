@@ -20,7 +20,7 @@ Actualmente las reservas se manejan de forma informal (planillas, WhatsApp), lo 
 - Node.js + Express
 - Persistencia en MongoDB con Mongoose
 - Pug como motor de plantillas
-- Sesiones con express-session
+- Autenticación con JWT en cookies HttpOnly
 
 ## Arquitectura
 
@@ -98,4 +98,4 @@ En la raíz de carpetas del sistema se encuentra una llamada "docs", en donde se
 
 ## Alcance
 
-No incluye autenticación avanzada ni integración con servicios externos. Esta entrega incluye API REST, persistencia en MongoDB, vistas dinámicas con Pug y Fetch, validaciones de negocio, y un sistema de autenticación con sesiones (express-session) y control de accesos basado en roles.
+No incluye autenticación avanzada ni integración con servicios externos. Esta entrega incluye API REST, persistencia en MongoDB, vistas dinámicas con Pug y Fetch, validaciones de negocio, y un sistema de autenticación con JWT y control de accesos basado en roles.
