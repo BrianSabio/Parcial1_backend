@@ -3,7 +3,7 @@ import { verificarToken } from '../utils/jwt.js';
 const esSolicitudApi = (req) => {
   return req.headers['content-type']?.includes('application/json') ||
     req.headers['accept']?.includes('application/json') ||
-    req.path.startsWith('/api/');
+    req.originalUrl.startsWith('/api/');
 };
 
 const responderNoAutenticado = (req, res) => {
