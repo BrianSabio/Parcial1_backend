@@ -102,6 +102,8 @@ export const registrarUsuario = async (req, res, next) => {
 };
 
 export const cerrarSesion = (req, res, next) => {
+  res.clearCookie('token');
+
   if (req.session) {
     req.session.destroy((err) => {
       if (err) return next(err);

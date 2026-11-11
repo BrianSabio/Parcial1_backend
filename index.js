@@ -14,6 +14,7 @@ import turnosRoutes from './routes/turnosRoutes.js';
 
 // Middleware propio
 import errorHandler from './middlewares/errorHandler.js';
+import { cargarUsuarioOpcional, esAutenticado } from './middlewares/loginHandler.js';
 
 // Vistas (Pug)
 import { mostrarVistaTurnos } from './controllers/turnosController.js';
@@ -53,8 +54,9 @@ app.use(session({
 }));
 
 // Usuario disponible en las vistas
+app.use(cargarUsuarioOpcional);
 app.use((req, res, next) => {
-  res.locals.usuarioLogueado = req.session?.usuario || null;
+  res.locals.usuarioLogueado = req.usuario || null;
   next();
 });
 
@@ -69,9 +71,9 @@ app.use("/api/servicios", serviciosRoutes);
 app.use("/api/turnos", turnosRoutes);
 
 // Rutas de vistas
-app.get("/vista/turnos", mostrarVistaTurnos);
-app.get("/vista/pacientes", mostrarVistaPacientes);
-app.get("/vista/profesionales", mostrarVistaProfesionales);
+app.get("/vista/turnos", esAutenticado, mostrarVistaTurnos);
+app.get("/vista/pacientes", esAutenticado, mostrarVistaPacientes);
+app.get("/vista/profesionales", esAutenticado, mostrarVistaProfesionales);
 
 // Manejo de errores
 app.use(errorHandler);

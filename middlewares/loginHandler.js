@@ -14,11 +14,11 @@ const responderNoAutenticado = (req, res) => {
   return res.redirect('/login');
 };
 
-const esAutenticado = (req, res, next) => {
+const cargarUsuarioDesdeToken = (req) => {
   const token = req.cookies?.token;
 
   if (!token) {
-    return responderNoAutenticado(req, res);
+    return false;
   }
 
   try {
@@ -29,7 +29,7 @@ const esAutenticado = (req, res, next) => {
       typeof payload.sub !== 'string' ||
       typeof payload.rol !== 'string'
     ) {
-      return responderNoAutenticado(req, res);
+      return false;
     }
 
     req.usuario = {
@@ -37,10 +37,23 @@ const esAutenticado = (req, res, next) => {
       rol: payload.rol
     };
 
-    return next();
+    return true;
   } catch (error) {
+    return false;
+  }
+};
+
+const cargarUsuarioOpcional = (req, res, next) => {
+  cargarUsuarioDesdeToken(req);
+  next();
+};
+
+const esAutenticado = (req, res, next) => {
+  if (!cargarUsuarioDesdeToken(req)) {
     return responderNoAutenticado(req, res);
   }
+
+  return next();
 };
 
 const permitirRoles = (...rolesPermitidos) => {
@@ -65,4 +78,4 @@ const permitirRoles = (...rolesPermitidos) => {
   };
 };
 
-export { esAutenticado, permitirRoles };
+export { cargarUsuarioOpcional, esAutenticado, permitirRoles };
