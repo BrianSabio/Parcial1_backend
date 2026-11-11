@@ -1,5 +1,6 @@
 import Usuario from '../models/Usuario.js';
 import bcrypt from 'bcrypt';
+import { crearToken } from '../utils/jwt.js';
 
 
 export const mostrarLogin = (req, res) => {
@@ -48,6 +49,14 @@ export const autenticarUsuario = async (req, res, next) => {
 
     req.session.save((err) => {
       if (err) return next(err);
+
+      const token = crearToken(usuarioEncontrado);
+      res.cookie('token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 1000
+      });
       
       res.status(200).json({ 
         mensaje: 'Autenticación exitosa.', 

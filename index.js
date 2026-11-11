@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import conectarDB from './config/db.js';
 import session from 'express-session';
+import cookieParser from 'cookie-parser';
 
 // Importación de rutas
 import loginRoutes from './routes/loginRoutes.js';
@@ -37,6 +38,7 @@ app.use(express.static('public'));
 // Parseo de solicitudes
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // Configuración de sesiones
 app.use(session({
