@@ -3,7 +3,15 @@ import Paciente from '../models/Paciente.js';
 
 export const obtenerPacientes = async (req, res, next) => {
   try {
-    const pacientes = await Paciente.find();
+    const { rol, pacienteRef } = req.usuario;
+    let filtro = {};
+    if (rol === 'paciente') {
+      if (!pacienteRef) {
+        return res.status(400).json({ error: "El usuario no tiene un perfil de paciente asociado." });
+      }
+      filtro._id = pacienteRef;
+    }
+    const pacientes = await Paciente.find(filtro);
     return res.status(200).json(pacientes);
   } catch (error) {
     next(error);
@@ -14,6 +22,12 @@ export const obtenerPacientes = async (req, res, next) => {
 export const obtenerPacientePorId = async (req, res, next) => {
   try {
     const { id } = req.params;
+    const { rol, pacienteRef } = req.usuario;
+
+    if (rol === 'paciente' && id !== pacienteRef?.toString()) {
+      return res.status(403).json({ error: "Acceso denegado: No tienes permiso para ver los datos de otro paciente." });
+    }
+
     const paciente = await Paciente.findById(id);
 
     if (!paciente) {
@@ -125,7 +139,15 @@ export const existePaciente = async (pacienteId) => {
 
 export const mostrarVistaPacientes = async (req, res, next) => {
   try {
-    const pacientes = await Paciente.find();
+    const { rol, pacienteRef } = req.usuario;
+    let filtro = {};
+
+  
+    if (rol === 'paciente') {
+      filtro._id = pacienteRef;
+    }
+
+    const pacientes = await Paciente.find(filtro);
     res.render('pacientes', { title: 'Gestión de Pacientes', pacientes });
   } catch (error) {
     next(error);

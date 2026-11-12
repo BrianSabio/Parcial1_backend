@@ -2,16 +2,29 @@ import Profesional from '../models/Profesional.js';
 
 export const obtenerProfesionales = async (req, res, next) => {
   try {
-    const profesionales = await Profesional.find();
+    const { rol, profesionalRef } = req.usuario;
+    let filtro = {};
+    if (rol === 'profesional') {
+      if (!profesionalRef) {
+        return res.status(400).json({ error: "El usuario no tiene un perfil de profesional asociado." });
+      }
+      filtro._id = profesionalRef;
+    }
+    const profesionales = await Profesional.find(filtro);
     return res.status(200).json(profesionales);
   } catch (error) {
     next(error);
   }
-};
+  };
 
 export const obtenerProfesionalPorId = async (req, res, next) => {
   try {
     const { id } = req.params;
+    const { rol, profesionalRef } = req.usuario;
+    if (rol === 'profesional' && id !== profesionalRef?.toString()) {
+      return res.status(403).json({ error: "Acceso denegado: No tienes permiso para ver la ficha de otro profesional." });
+    }
+
     const profesional = await Profesional.findById(id);
 
     if (!profesional) {
@@ -99,7 +112,15 @@ export const existeProfesional = async (profesionalId) => {
 
 export const mostrarVistaProfesionales = async (req, res, next) => {
   try {
-    const profesionales = await Profesional.find();
+    const { rol, profesionalRef } = req.usuario;
+    let filtro = {};
+
+
+    if (rol === 'profesional') {
+      filtro._id = profesionalRef;
+    }
+
+    const profesionales = await Profesional.find(filtro);
     res.render('profesionales', { title: 'Gestión de Profesionales', profesionales });
   } catch (error) {
     next(error);

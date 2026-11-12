@@ -34,7 +34,9 @@ const cargarUsuarioDesdeToken = (req) => {
 
     req.usuario = {
       id: payload.sub,
-      rol: payload.rol
+      rol: payload.rol,
+      pacienteRef: payload.pacienteRef,      
+      profesionalRef: payload.profesionalRef
     };
 
     return true;

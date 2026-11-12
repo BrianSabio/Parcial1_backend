@@ -5,20 +5,38 @@ import Disponibilidad from '../models/Disponibilidad.js';
 
 export const obtenerTurnos = async (req, res, next) => {
   try {
-    const turnos = await Turno.find()
+    const { rol, pacienteRef, profesionalRef } = req.usuario;
+    let filtro = {};
+
+    if (rol === 'paciente') {
+      if (!pacienteRef) {
+        return res.status(400).json({ mensaje: 'El usuario no tiene un perfil de paciente asociado.' });
+      }
+      filtro.pacienteId = pacienteRef;
+    } else if (rol === 'profesional') {
+      if (!profesionalRef) {
+        return res.status(400).json({ mensaje: 'El usuario no tiene un perfil de profesional asociado.' });
+      }
+      filtro.profesionalId = profesionalRef;
+    }
+
+    const turnos = await Turno.find(filtro)
       .populate('pacienteId', 'nombre apellido dni')
       .populate('profesionalId', 'nombre apellido especialidad')
       .populate('servicioId', 'tipo');
 
     res.status(200).json(turnos);
-  } catch (error) {
+  } catch (error) {  
     next(error);
   }
 };
 
+
 export const obtenerTurnoPorId = async (req, res, next) => {
   try {
     const { id } = req.params;
+    const { rol, pacienteRef, profesionalRef } = req.usuario;
+
     const turno = await Turno.findById(id)
       .populate('pacienteId', 'nombre apellido dni')
       .populate('profesionalId', 'nombre apellido especialidad')
@@ -28,6 +46,13 @@ export const obtenerTurnoPorId = async (req, res, next) => {
       return res.status(404).json({ mensaje: 'Error: Turno no encontrado' });
     }
 
+    if (rol === 'paciente' && turno.pacienteId._id.toString() !== pacienteRef?.toString()) {
+      return res.status(403).json({ mensaje: 'Acceso denegado: No tienes permiso para ver este turno' });
+    }
+
+    if (rol === 'profesional' && turno.profesionalId._id.toString() !== profesionalRef?.toString()) {
+      return res.status(403).json({ mensaje: 'Acceso denegado: No tienes permiso para ver este turno' });
+    }
     res.status(200).json(turno);
   } catch (error) {
     next(error);
@@ -209,26 +234,34 @@ export const eliminarTurno = async (req, res, next) => {
 
 export const mostrarVistaTurnos = async (req, res, next) => {
   try {
-    const turnos = await Turno.find()
+    const { rol, pacienteRef, profesionalRef } = req.usuario;
+    let filtro = {};
+
+    // Aplicamos la misma lógica de filtrado para las vistas HTML/EJS
+    if (rol === 'paciente') {
+      filtro.pacienteId = pacienteRef;
+    } else if (rol === 'profesional') {
+      filtro.profesionalId = profesionalRef;
+    }
+
+    const turnos = await Turno.find(filtro)
       .populate('pacienteId', 'nombre apellido')
       .populate('profesionalId', 'nombre apellido');
-
-    const turnosCompletos = turnos.map(t => {
-      const p = t.pacienteId;
-      const prof = t.profesionalId;
-      return {
-        ...t.toObject(),
-        pacienteNombre: p ? `${p.nombre} ${p.apellido}` : 'Sin especificar',
-        profesionalNombre: prof ? `${prof.nombre} ${prof.apellido}` : 'Sin especificar'
-      };
-    });
-
-    res.render('turnos', { title: 'Gestión de Turnos', turnos: turnosCompletos });
-  } catch (error) {
-    next(error);
-  }
-};
-
+      const turnosCompletos = turnos.map(t => {
+        const p = t.pacienteId;
+        const prof = t.profesionalId;
+        return {
+          ...t.toObject(),
+          pacienteNombre: p ? `${p.nombre} ${p.apellido}` : 'Sin especificar',
+          profesionalNombre: prof ? `${prof.nombre} ${prof.apellido}` : 'Sin especificar'
+        };
+      });
+  
+      res.render('turnos', { title: 'Gestión de Turnos', turnos: turnosCompletos });
+    } catch (error) {
+      next(error);
+    }
+  };
 
 export const obtenerTurnosPorPaciente = async (req, res, next) => {
   try {

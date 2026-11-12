@@ -13,7 +13,9 @@ const obtenerSecret = () => {
 const crearToken = (usuario) => {
   return jwt.sign(
     {
-      rol: usuario.rol
+      rol: usuario.rol,
+      pacienteRef: usuario.pacienteRef?._id || usuario.pacienteRef || null,
+      profesionalRef: usuario.profesionalRef?._id || usuario.profesionalRef || null
     },
     obtenerSecret(),
     {

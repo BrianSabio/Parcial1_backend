@@ -2,7 +2,18 @@ import Servicio from '../models/Servicio.js';
 
 export const obtenerServicios = async (req, res, next) => {
   try {
-    const servicios = await Servicio.find()
+    const { rol, pacienteRef } = req.usuario;
+    let filtro = {};
+
+    if (rol === 'paciente') {
+      if (!pacienteRef) {
+        return res.status(400).json({ mensaje: 'El usuario no tiene un perfil de paciente asociado.' });
+      }
+      filtro.pacienteId = pacienteRef;
+    }
+  
+
+    const servicios = await Servicio.find(filtro)
       .populate('pacienteId', 'nombre apellido dni');
       
     res.json(servicios);
@@ -14,11 +25,17 @@ export const obtenerServicios = async (req, res, next) => {
 export const obtenerServicioById = async (req, res, next) => {
   try {
     const { id } = req.params;
+    const { rol, pacienteRef } = req.usuario;
+
     const servicio = await Servicio.findById(id)
       .populate('pacienteId', 'nombre apellido dni');
 
     if (!servicio) {
       return res.status(404).json({ mensaje: 'Servicio no encontrado' });
+    }
+    
+    if (rol === 'paciente' && servicio.pacienteId._id.toString() !== pacienteRef?.toString()) {
+      return res.status(403).json({ mensaje: 'Acceso denegado: No tienes permiso para ver este servicio' });
     }
 
     res.json(servicio);
@@ -93,7 +110,14 @@ export const eliminarServicio = async (req, res, next) => {
 
 export const obtenerEstadoPaquetePaciente = async (req, res, next) => {
   try {
-    const { pacienteId } = req.params;
+    let { pacienteId } = req.params;
+    const { rol, pacienteRef } = req.usuario;
+    if (rol === 'paciente') {
+      if (!pacienteRef) {
+        return res.status(400).json({ mensaje: 'El usuario no tiene un perfil de paciente asociado.' });
+      }
+      pacienteId = pacienteRef;
+    }
 
     const serviciosPaciente = await Servicio.find({ pacienteId });
 
