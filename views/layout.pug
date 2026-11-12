@@ -2,17 +2,36 @@ doctype html
 html(lang="es")
   head
     meta(charset="UTF-8")
-    title= title || "CIKIRE"
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title= title || "CIKIRE - Centro Integral de Kinesiología y Rehabilitación"
+    link(rel="icon", type="image/png", href="/img/faviconcikire.png")
+    link(rel="stylesheet", href="/css/style.css")
+    link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css")
+  
   body
-    h1.encabezado#tituloPrincipal CIKIRE — Gestión de Turnos
-    
-    if usuarioLogueado
-      nav.navbar
-        a(href="/vista/turnos") Turnos
-        a(href="/vista/pacientes") Pacientes
-        a(href="/vista/profesionales") Profesionales
-        a(href="/login/logout") Salir
-    
+    header.navbar
+      .logo
+        a(href="/")
+          img(src="/img/Cikire.png", alt="CIKIRE Logo", style="height: 60px; object-fit: contain;")
+      
+      nav.nav-links
+        if usuarioLogueado
+          a(href="/vista/turnos") Turnos
+          a(href="/vista/pacientes") Pacientes
+          a(href="/vista/profesionales") Profesionales
+        else
+          a.active(href="/") Inicio
+          a(href="#") Especialidades
+          a(href="#") Nosotros
+          a(href="#") Contacto
+      
+      .nav-actions
+        if usuarioLogueado
+          a.btn.btn-outline(href="/login/logout") #[i.fas.fa-sign-out-alt] Salir
+        else
+          a.btn.btn-outline(href="/login") #[i.far.fa-user] Iniciar sesión
+          a.btn.btn-primary(href="/login") #[i.far.fa-calendar-alt] Reservar turno
+
     block content
 
     include asistencia.pug

@@ -60,7 +60,6 @@ FORMATO:
   la información.
 `;
 
-// Control de consultas por conexión
 function puedeConsultar(socket) {
   const ahora = Date.now();
   let limite = socket.data.limiteConsultas;
@@ -85,6 +84,11 @@ function puedeConsultar(socket) {
 export const inicializarChat = (io) => {
   io.on('connection', (socket) => {
     console.log('Cliente conectado al chat:', socket.id);
+    // Mensaje automático de bienvenida al conectar
+    socket.emit('chat:mensaje', {
+      texto: "¡Hola! Soy el asistente virtual de CIKIRE. ¿En qué te puedo ayudar hoy?",
+      fecha: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    });
     // Historial independiente de cada conexión
     socket.data.historial = [];
     socket.on('chat:mensaje', async (data) => {
@@ -101,20 +105,12 @@ export const inicializarChat = (io) => {
         return;
       }
 
-      // Cambbiar al ajustar el Frontend para que el usuario NO escriba @asistente al inicio de la consulta
-      if (!/^@asistente\b/i.test(texto)) {
+      if (!texto) {
         return;
       }
+      
+      const pregunta = texto;
 
-      const pregunta = texto
-        .replace(/^@asistente\b/i, '')
-        .trim();
-
-      if (!pregunta) {
-        return;
-      }
-
-      // Mostrar la pregunta del usuario en el chat
         socket.emit('chat:mensaje', {
         texto: pregunta,
         remitente: 'usuario',
@@ -135,7 +131,6 @@ export const inicializarChat = (io) => {
 
       const historial = socket.data.historial;
 
-      // Guardar pregunta
       historial.push({
         role: 'user',
         content: pregunta
@@ -143,7 +138,7 @@ export const inicializarChat = (io) => {
 
       try {
 
-        // Indicar que el asistente está escribiendo
+
         socket.emit('chat:estado', {
           escribiendo: true
         });
@@ -169,13 +164,11 @@ export const inicializarChat = (io) => {
           throw new Error('El modelo no generó una respuesta.');
         }
 
-        // Guardar respuesta en el historial
         historial.push({
           role: 'assistant',
           content: respuesta
         });
 
-        // Conservar los últimos 10 intercambios
         if (historial.length > MAX_MENSAJES * 2) {
 
           historial.splice(
@@ -185,7 +178,6 @@ export const inicializarChat = (io) => {
 
         }
 
-        // Responder únicamente al usuario que consultó
         socket.emit('chat:mensaje', {
         texto: respuesta,
         remitente: 'asistente',
@@ -197,7 +189,6 @@ export const inicializarChat = (io) => {
 
       } catch (error) {
 
-        // Eliminar la pregunta si la consulta falló
         if (historial.at(-1)?.role === 'user') {
           historial.pop();
         }
@@ -213,7 +204,6 @@ export const inicializarChat = (io) => {
 
       } finally {
 
-        // Finalizar indicador de escritura
         socket.emit('chat:estado', {
           escribiendo: false
         });

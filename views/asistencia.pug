@@ -1,10 +1,19 @@
-if usuarioLogueado
-  div.chat-widget#chatAsistencia
-    h4 Asistencia CIKIRE
-    div.chat-box#chatHistorial
-    form#chatForm.chat-input
-      input#chatInput(type="text" placeholder="Escribí tu mensaje (poné @gemini para IA)..." autocomplete="off")
-      button(type="submit") Enviar
+//- Botón flotante para abrir el chat
+button#chatToggle.chat-toggle-btn
+  i.fas.fa-robot
+  span ¿En qué puedo ayudarte?
 
-  script(src="/socket.io/socket.io.js")
-  script(src="/js/asistencia.js")
+//- Contenedor del chat (inicialmente oculto)
+#chat-widget.hidden
+  .chat-header
+    h4 #[i.fas.fa-robot] Asistencia CIKIRE
+    button#closeChat(type="button") &times;
+  
+  #chatHistorial
+  
+  form#chatForm
+    input#chatInput(type="text" placeholder="Escribí tu consulta..." autocomplete="off")
+    button(type="submit") #[i.fas.fa-paper-plane]
+
+script(src="/socket.io/socket.io.js")
+script(src="/js/asistencia.js")

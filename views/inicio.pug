@@ -1,0 +1,57 @@
+extends layout.pug
+
+block content
+  section.hero
+    .hero-text
+      h1(style="color: var(--dark-blue);") Tu bienestar, #[br] #[span(style="color: var(--cyan);") nuestra prioridad.]
+      p Centro integral de kinesiología y rehabilitación #[br] para que vuelvas a moverte sin dolor.
+      hr.divider
+      a.btn.btn-primary.btn-lg(href="/login") #[i.far.fa-calendar-alt] Reservar turno #[i.fas.fa-arrow-right]
+  
+  section.stats-container
+    .stats-bar
+      .stat-item
+        i.fas.fa-user-doctor.icon-blue
+        .stat-text
+          strong Profesionales
+          span Especializados
+      .stat-divider
+      .stat-item
+        i.far.fa-calendar-check.icon-blue
+        .stat-text
+          strong +3.200
+          span Turnos Mensuales
+      .stat-divider
+      .stat-item
+        i.fas.fa-shield-heart.icon-blue
+        .stat-text
+          strong Obras Sociales
+          span y Particulares
+
+  section.services
+    .services-intro
+      h2 Nuestras áreas #[br] de atención
+      p Un equipo de profesionales comprometidos con tu rehabilitación integral y bienestar a largo plazo.
+      a.btn.btn-dark(href="#") Conocer más #[i.fas.fa-arrow-right]
+    
+    .services-grid
+      .service-card
+        i.fas.fa-walking.icon-cyan
+        h3 Kinesiología General
+        p Rehabilitación post-quirúrgica y tratamientos recurrentes.
+      .service-card
+        i.fas.fa-running.icon-cyan
+        h3 Traumatología y Deportes
+        p Prevención de lesiones y optimización del rendimiento físico.
+      .service-card
+        i.fas.fa-baby.icon-cyan
+        h3 Kinesiología Pediátrica
+        p Tratamiento de alteraciones posturales y desarrollo infantil.
+      .service-card
+        i.fas.fa-brain.icon-cyan
+        h3 Neurorrehabilitación
+        p Fisioterapia, osteopatía y drenaje linfático especializado.
+
+  footer.footer
+    p &copy; 2026 CIKIRE - Centro Integral de Kinesiología y Rehabilitación. Todos los derechos reservados.
+    p Desarrollo de Sistemas Web (Back End) - Tecnicatura en Desarrollo de Software

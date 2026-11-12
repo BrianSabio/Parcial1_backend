@@ -2,7 +2,6 @@ import Usuario from '../models/Usuario.js';
 import bcrypt from 'bcrypt';
 import { crearToken } from '../utils/jwt.js';
 
-
 export const mostrarLogin = (req, res) => {
   res.render('login', { title: 'Iniciar Sesión' });
 };
@@ -52,10 +51,8 @@ export const autenticarUsuario = async (req, res, next) => {
       maxAge: 60 * 60 * 1000
     });
 
-    res.status(200).json({
-      mensaje: 'Autenticación exitosa.',
-      usuario: usuarioSesion
-    });
+    // CAMBIO CLAVE: En lugar de devolver JSON crudo, redirigimos a la vista principal del sistema
+    res.redirect('/vista/turnos');
 
   } catch (error) {
     next(error);
@@ -85,6 +82,7 @@ export const registrarUsuario = async (req, res, next) => {
     const usuarioRegistrado = nuevoUsuario.toObject();
     delete usuarioRegistrado.password;
 
+    // Acá también podés poner res.redirect('/login') si querés que al registrarse vaya al login
     return res.status(201).json({
       mensaje: 'Usuario registrado correctamente.',
       usuario: usuarioRegistrado

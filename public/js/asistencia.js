@@ -4,6 +4,22 @@ const chatForm = document.getElementById('chatForm');
 const chatInput = document.getElementById('chatInput');
 const chatHistorial = document.getElementById('chatHistorial');
 
+const chatToggle = document.getElementById('chatToggle');
+const chatWidget = document.getElementById('chat-widget');
+const closeChat = document.getElementById('closeChat');
+
+if (chatToggle && chatWidget && closeChat) {
+    chatToggle.addEventListener('click', () => {
+        chatWidget.classList.remove('hidden');
+        chatToggle.style.display = 'none';
+    });
+
+    closeChat.addEventListener('click', () => {
+        chatWidget.classList.add('hidden');
+        chatToggle.style.display = 'flex';
+    });
+}
+
 if (chatForm) {
   chatForm.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -16,7 +32,6 @@ if (chatForm) {
       });
       chatInput.value = '';
     }
-
   });
 
   socket.on('chat:mensaje', (data) => {

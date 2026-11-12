@@ -64,6 +64,10 @@ app.use("/api/servicios", serviciosRoutes);
 app.use("/api/turnos", turnosRoutes);
 
 // Rutas de vistas
+app.get("/", (req, res) => {
+  res.render("inicio");
+});
+
 app.get("/vista/turnos", esAutenticado, mostrarVistaTurnos);
 app.get("/vista/pacientes", esAutenticado, mostrarVistaPacientes);
 app.get("/vista/profesionales", esAutenticado, mostrarVistaProfesionales);
