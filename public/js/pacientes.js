@@ -10,6 +10,11 @@ async function cargarPacientes() {
 
     const tbody = document.querySelector('#cuerpoTablaPacientes');
     const sinPacientes = document.querySelector('#sinPacientes');
+    const rol = document.querySelector('.admin-page')?.dataset.rol || '';
+    const puedeEditar = ['administrativo', 'coordinador', 'recepcionista'].includes(rol);
+
+    const thAcciones = document.querySelector('#tablaPacientes th:last-child');
+    if (thAcciones) thAcciones.style.display = puedeEditar ? '' : 'none';
 
     if (pacientes.length === 0) {
       if (tbody) tbody.innerHTML = '';
@@ -26,10 +31,12 @@ async function cargarPacientes() {
         <td>${paciente.dni}</td>
         <td>${paciente.telefono || '-'}</td>
         <td>${paciente.email || '-'}</td>
-        <td>
-          <button class="btn-editar" onclick="editarPaciente('${paciente._id}')">Editar</button>
-          <button class="btn-eliminar" onclick="eliminarPaciente('${paciente._id}')">Eliminar</button>
-        </td>
+        ${puedeEditar ? `
+          <td>
+            <button class="btn-editar" onclick="editarPaciente('${paciente._id}')">Editar</button>
+            <button class="btn-eliminar" onclick="eliminarPaciente('${paciente._id}')">Eliminar</button>
+          </td>
+        ` : ''}
       </tr>
     `).join('');
 
@@ -70,11 +77,10 @@ function configurarFormulario() {
       const data = await respuesta.json();
 
       if (respuesta.ok) {
-        console.log('Paciente creado:', data);
         formulario.reset();
         cargarPacientes();
       } else {
-        alert('Error: ' + (data.error || 'No se pudo crear el paciente'));
+        alert('Error: ' + (data.mensaje || data.error || 'No se pudo crear el paciente'));
       }
     } catch (error) {
       console.error('Error de red:', error);
@@ -94,10 +100,9 @@ async function eliminarPaciente(id) {
     const data = await respuesta.json();
 
     if (respuesta.ok) {
-      console.log('Paciente eliminado:', data);
       cargarPacientes();
     } else {
-      alert('Error: ' + (data.error || 'No se pudo eliminar el paciente'));
+      alert('Error: ' + (data.mensaje || data.error || 'No se pudo eliminar el paciente'));
     }
   } catch (error) {
     console.error('Error de red:', error);

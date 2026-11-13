@@ -12,10 +12,11 @@ import profesionalesRoutes from './routes/profesionalesRoutes.js';
 import disponibilidadRoutes from './routes/disponibilidadRoutes.js';
 import serviciosRoutes from './routes/serviciosRoutes.js';
 import turnosRoutes from './routes/turnosRoutes.js';
+import usuariosRoutes from './routes/usuariosRoutes.js';
 
 // Middleware propio
 import errorHandler from './middlewares/errorHandler.js';
-import { cargarUsuarioOpcional, esAutenticado } from './middlewares/loginHandler.js';
+import { cargarUsuarioOpcional, esAutenticado, permitirRoles } from './middlewares/loginHandler.js';
 
 // Vistas (Pug)
 import { mostrarVistaTurnos } from './controllers/turnosController.js';
@@ -62,6 +63,7 @@ app.use("/api/profesionales", profesionalesRoutes);
 app.use("/api/disponibilidad", disponibilidadRoutes);
 app.use("/api/servicios", serviciosRoutes);
 app.use("/api/turnos", turnosRoutes);
+app.use("/api/usuarios", usuariosRoutes);
 
 // Rutas de vistas
 app.get("/", (req, res) => {
@@ -69,8 +71,24 @@ app.get("/", (req, res) => {
 });
 
 app.get("/vista/turnos", esAutenticado, mostrarVistaTurnos);
-app.get("/vista/pacientes", esAutenticado, mostrarVistaPacientes);
-app.get("/vista/profesionales", esAutenticado, mostrarVistaProfesionales);
+app.get(
+  "/vista/pacientes",
+  esAutenticado,
+  permitirRoles('administrativo', 'coordinador', 'recepcionista', 'profesional', 'director'),
+  mostrarVistaPacientes
+);
+app.get(
+  "/vista/profesionales",
+  esAutenticado,
+  permitirRoles('administrativo', 'coordinador', 'recepcionista', 'director'),
+  mostrarVistaProfesionales
+);
+app.get(
+  "/vista/usuarios",
+  esAutenticado,
+  permitirRoles('director', 'coordinador'),
+  (req, res) => res.render('usuarios', { title: 'Gestión de Equipo y Usuarios' })
+);
 
 // Manejo de errores
 app.use(errorHandler);

@@ -1,4 +1,5 @@
 import Usuario from '../models/Usuario.js';
+import Paciente from '../models/Paciente.js';
 import bcrypt from 'bcrypt';
 import { crearToken } from '../utils/jwt.js';
 
@@ -51,7 +52,6 @@ export const autenticarUsuario = async (req, res, next) => {
       maxAge: 60 * 60 * 1000
     });
 
-    // CAMBIO CLAVE: En lugar de devolver JSON crudo, redirigimos a la vista principal del sistema
     res.redirect('/vista/turnos');
 
   } catch (error) {
@@ -61,11 +61,30 @@ export const autenticarUsuario = async (req, res, next) => {
 
 export const registrarUsuario = async (req, res, next) => {
   try {
-    const { nombre, apellido, usuario, password, rol, estado } = req.body;
+    const { nombre, apellido, dni, telefono, email, usuario, password } = req.body;
+
+    const esAdminLogueado = req.usuario && req.usuario.rol === 'administrativo';
+    const rolSeguro = esAdminLogueado && req.body.rol ? req.body.rol : 'paciente';
 
     const usuarioExistente = await Usuario.findOne({ usuario });
     if (usuarioExistente) {
       return res.status(400).json({ mensaje: 'El nombre de usuario ya está en uso.' });
+    }
+
+    let pacienteRef = null;
+    if (rolSeguro === 'paciente') {
+      let fichaPaciente = dni ? await Paciente.findOne({ dni }) : null;
+      if (!fichaPaciente) {
+        fichaPaciente = new Paciente({
+          nombre,
+          apellido,
+          dni: dni || `TMP-${Date.now()}`,
+          telefono: telefono || 'Sin especificar',
+          email: email || undefined
+        });
+        await fichaPaciente.save();
+      }
+      pacienteRef = fichaPaciente._id;
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
@@ -74,15 +93,15 @@ export const registrarUsuario = async (req, res, next) => {
       apellido,
       usuario,
       password: passwordHash,
-      rol,
-      estado
+      rol: rolSeguro,
+      estado: 'activo',
+      pacienteRef
     });
     await nuevoUsuario.save();
 
     const usuarioRegistrado = nuevoUsuario.toObject();
     delete usuarioRegistrado.password;
 
-    // Acá también podés poner res.redirect('/login') si querés que al registrarse vaya al login
     return res.status(201).json({
       mensaje: 'Usuario registrado correctamente.',
       usuario: usuarioRegistrado

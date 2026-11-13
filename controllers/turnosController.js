@@ -61,7 +61,11 @@ export const obtenerTurnoPorId = async (req, res, next) => {
 
 export const crearTurno = async (req, res, next) => {
   try {
-    const { pacienteId, profesionalId, servicioId, fecha, hora } = req.body;
+    const { rol, pacienteRef } = req.usuario;
+    const { profesionalId, servicioId, fecha, hora } = req.body;
+
+    // Si es paciente, usamos obligatoriamente el ID asociado a su token
+    const pacienteId = rol === 'paciente' ? pacienteRef : req.body.pacienteId;
 
     if (!pacienteId || !profesionalId || !servicioId || !fecha || !hora) {
       return res.status(400).json({ 

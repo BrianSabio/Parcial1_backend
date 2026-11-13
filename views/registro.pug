@@ -1,40 +1,56 @@
-doctype html
-html(lang="es")
-  head
-    meta(charset="UTF-8")
-    meta(name="viewport", content="width=device-width, initial-scale=1.0")
-    title Registro - CIKIRE
-  body
-    .login-container
-      h2 Crear Nuevo Usuario
-      p.alert-error#mensajeError
-      p.alert-success#mensajeExito
+extends layout.pug
+
+block content
+  .login-container(style="max-width: 440px; margin: 3.5rem auto; padding: 2rem; background: white; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.08);")
+    h2(style="text-align: center; color: var(--dark-blue); margin-bottom: 1.5rem;")= usuarioLogueado && usuarioLogueado.rol === 'administrativo' ? 'Alta de Personal / Usuario' : 'Crear cuenta de paciente'
+    
+    p.alert-error#mensajeError(style="color: #dc2626; text-align: center; font-size: 0.9rem; margin-bottom: 1rem;")
+    p.alert-success#mensajeExito(style="color: #16a34a; text-align: center; font-size: 0.9rem; margin-bottom: 1rem;")
+    
+    form#formRegistro
+      .form-group(style="margin-bottom: 1rem;")
+        label(for="nombre" style="display: block; margin-bottom: 0.4rem; font-weight: 600; color: var(--dark-blue);") Nombre:
+        input#nombre(type="text", required=true, style="width: 100%; padding: 0.6rem; border-radius: 6px; border: 1px solid #ccc;")
       
-      form#formRegistro
-        .form-group
-          label(for="nombre") Nombre:
-          input#nombre(type="text", required=true)
-        .form-group
-          label(for="apellido") Apellido:
-          input#apellido(type="text", required=true)
-        .form-group
-          label(for="usuario") Nombre de Usuario:
-          input#usuario(type="text", required=true)
-        .form-group
-          label(for="password") Contraseña:
-          input#password(type="password", required=true)
-        .form-group
-          label(for="rol") Rol:
-          select#rol(required=true)
+      .form-group(style="margin-bottom: 1rem;")
+        label(for="apellido" style="display: block; margin-bottom: 0.4rem; font-weight: 600; color: var(--dark-blue);") Apellido:
+        input#apellido(type="text", required=true, style="width: 100%; padding: 0.6rem; border-radius: 6px; border: 1px solid #ccc;")
+
+      .form-group(style="margin-bottom: 1rem;")
+        label(for="dni" style="display: block; margin-bottom: 0.4rem; font-weight: 600; color: var(--dark-blue);") DNI:
+        input#dni(type="text", required=true, placeholder="Sin puntos", style="width: 100%; padding: 0.6rem; border-radius: 6px; border: 1px solid #ccc;")
+
+      .form-group(style="margin-bottom: 1rem;")
+        label(for="telefono" style="display: block; margin-bottom: 0.4rem; font-weight: 600; color: var(--dark-blue);") Teléfono:
+        input#telefono(type="text", required=true, style="width: 100%; padding: 0.6rem; border-radius: 6px; border: 1px solid #ccc;")
+      
+      .form-group(style="margin-bottom: 1rem;")
+        label(for="email" style="display: block; margin-bottom: 0.4rem; font-weight: 600; color: var(--dark-blue);") Email (opcional):
+        input#email(type="email", placeholder="ejemplo@correo.com", style="width: 100%; padding: 0.6rem; border-radius: 6px; border: 1px solid #ccc;")
+      
+      .form-group(style="margin-bottom: 1rem;")
+        label(for="usuario" style="display: block; margin-bottom: 0.4rem; font-weight: 600; color: var(--dark-blue);") Nombre de usuario:
+        input#usuario(type="text", required=true, style="width: 100%; padding: 0.6rem; border-radius: 6px; border: 1px solid #ccc;")
+      
+      .form-group(style="margin-bottom: 1.5rem;")
+        label(for="password" style="display: block; margin-bottom: 0.4rem; font-weight: 600; color: var(--dark-blue);") Contraseña:
+        input#password(type="password", required=true, style="width: 100%; padding: 0.6rem; border-radius: 6px; border: 1px solid #ccc;")
+      
+      //- Solo un administrativo logueado puede elegir roles internos
+      if usuarioLogueado && usuarioLogueado.rol === 'administrativo'
+        .form-group(style="margin-bottom: 1.5rem;")
+          label(for="rol" style="display: block; margin-bottom: 0.4rem; font-weight: 600; color: var(--dark-blue);") Rol asignado:
+          select#rol(required=true, style="width: 100%; padding: 0.6rem; border-radius: 6px; border: 1px solid #ccc;")
             option(value="paciente") Paciente
             option(value="recepcionista") Recepcionista
             option(value="profesional") Profesional
             option(value="administrativo") Administrativo
             option(value="coordinador") Coordinador
             option(value="director") Director
-        
-        button(type="submit") Registrarse
       
-      p ¿Ya tenés usuario? 
-        a(href="/login") Iniciá Sesión
-    script(src="/js/registro.js")
+      button.btn.btn-primary(type="submit" style="width: 100%; justify-content: center;") Registrarse
+    
+    p(style="text-align: center; margin-top: 1.2rem;") ¿Ya tenés usuario? 
+      a(href="/login" style="color: var(--cyan); font-weight: 600;") Iniciá Sesión
+
+  script(src="/js/registro.js")

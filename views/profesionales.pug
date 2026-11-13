@@ -1,27 +1,62 @@
 extends layout
 
 block content
-  .contenedor-profesionales
-    h2 Gestión de Profesionales
+  .admin-page(data-rol=usuarioLogueado.rol)
+    .admin-header
+      h2 Gestión de Profesionales
+      p Staff médico habilitados en CIKIRE.
 
-    .formulario-profesional
-      h3 Agregar Profesional
-      form#formProfesional
-        .form-group
-          label(for="nombre") Nombre:
-          input#nombre(type="text", name="nombre", required=true)
+    if usuarioLogueado && ['administrativo', 'coordinador'].includes(usuarioLogueado.rol)
+      .admin-card
+        h3#tituloFormProfesional Agregar Profesional
+        form#formProfesional.admin-form-grid
+          input#profesionalIdEdit(type="hidden")
 
-        .form-group
-          label(for="apellido") Apellido:
-          input#apellido(type="text", name="apellido", required=true)
+          .form-group
+            label(for="nombre") Nombre
+            input#nombre.form-control(type="text", name="nombre", placeholder="Ingresá el nombre", required=true)
 
-        .form-group
-          label(for="especialidad") Especialidad:
-          input#especialidad(type="text", name="especialidad", required=true)
+          .form-group
+            label(for="apellido") Apellido
+            input#apellido.form-control(type="text", name="apellido", placeholder="Ingresá el apellido", required=true)
 
-        button(type="submit") Guardar Profesional
+          .form-group
+            label(for="especialidad") Especialidad
+            input#especialidad.form-control(type="text", name="especialidad", placeholder="Ej: Kinesiología, Traumatología...", required=true)
 
-    div#contenedorTabla
-      p.vacio#sinProfesionales No hay profesionales registrados todavía.
+          .form-group
+            label(for="matricula") Matrícula
+            input#matricula.form-control(type="text", name="matricula", placeholder="Ej: MN-45821")
+
+          .form-group
+            label(for="telefono") Teléfono
+            input#telefono.form-control(type="text", name="telefono", placeholder="Ej: 11-4521-8890")
+
+          .form-group
+            label(for="email") Email
+            input#email.form-control(type="email", name="email", placeholder="Ej: profesional@cikire.com.ar")
+
+          .form-group
+            label(for="estado") Estado
+            select#estado.form-control(name="estado")
+              option(value="activo", selected=true) Activo
+              option(value="inactivo") Inactivo
+
+          .form-actions(style="display:flex; gap:0.6rem; align-items:flex-end;")
+            button#btnGuardarProfesional.btn.btn-primary(type="submit") Guardar Profesional
+            button#btnCancelarEdicionProf.btn-cancelar-turno(type="button", style="display:none;") Cancelar
+
+    .admin-card
+      .card-header-flex(style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1rem;")
+        h3(style="margin:0;") Staff de Profesionales
+        .filtro-estado-box(style="display:flex; align-items:center; gap:0.5rem;")
+          label(for="filtroEstadoProf", style="font-size:0.9rem; font-weight:600; color:var(--dark-blue); margin:0;") Mostrar:
+          select#filtroEstadoProf.form-control(style="width:auto; padding:0.4rem 0.85rem;")
+            option(value="todos", selected=true) Todos
+            option(value="activo") Activos
+            option(value="inactivo") Inactivos
+
+      div#contenedorTabla.table-responsive
+        p.vacio#sinProfesionales No hay profesionales registrados todavía.
 
   script(src="/js/profesionales.js")

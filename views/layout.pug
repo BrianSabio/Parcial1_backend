@@ -7,31 +7,71 @@ html(lang="es")
     link(rel="icon", type="image/png", href="/img/faviconcikire.png")
     link(rel="stylesheet", href="/css/style.css")
     link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css")
+    link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css")
   
   body
     header.navbar
-      .logo
-        a(href="/")
-          img(src="/img/Cikire.png", alt="CIKIRE Logo", style="height: 60px; object-fit: contain;")
-      
-      nav.nav-links
-        if usuarioLogueado
-          a(href="/vista/turnos") Turnos
-          a(href="/vista/pacientes") Pacientes
-          a(href="/vista/profesionales") Profesionales
-        else
-          a.active(href="/") Inicio
-          a(href="#") Especialidades
-          a(href="#") Nosotros
-          a(href="#") Contacto
-      
-      .nav-actions
-        if usuarioLogueado
-          a.btn.btn-outline(href="/login/logout") #[i.fas.fa-sign-out-alt] Salir
-        else
-          a.btn.btn-outline(href="/login") #[i.far.fa-user] Iniciar sesión
-          a.btn.btn-primary(href="/login") #[i.far.fa-calendar-alt] Reservar turno
+      .navbar-top
+        .logo
+          a(href="/")
+            img(src="/img/Cikire.png", alt="CIKIRE Logo", style="height: 60px; object-fit: contain;")
+        button#navToggle.nav-toggle(type="button", aria-label="Abrir menú", aria-expanded="false")
+          i.fas.fa-bars
 
-    block content
+      #navMenu.nav-menu
+        nav.nav-links
+          if usuarioLogueado
+            - const esGestionOAudit = ['administrativo', 'coordinador', 'recepcionista', 'director'].includes(usuarioLogueado.rol)
+            a(href="/vista/turnos")= usuarioLogueado.rol === 'paciente' ? 'Mis Turnos' : 'Turnos'
+            if esGestionOAudit || usuarioLogueado.rol === 'profesional'
+              a(href="/vista/pacientes") Pacientes
+            if esGestionOAudit
+              a(href="/vista/profesionales") Profesionales
+            if ['director', 'coordinador'].includes(usuarioLogueado.rol)
+              a(href="/vista/usuarios") Equipo
+          else
+            a.active(href="/") Inicio
+            a(href="/#especialidades") Especialidades
+            a(href="/#nosotros") Nosotros
+            a(href="/#contacto") Contacto
+        
+        .nav-actions
+          if usuarioLogueado
+            a.btn.btn-outline(href="/login/logout") #[i.fas.fa-sign-out-alt] Salir
+          else
+            a.btn.btn-outline(href="/login") #[i.far.fa-user] Iniciar sesión
+            a.btn.btn-primary(href="/login") #[i.far.fa-calendar-alt] Reservar turno
 
-    include asistencia.pug
+    main.main-wrapper
+      block content
+
+    footer.footer
+      p &copy; 2026 CIKIRE - Centro Integral de Kinesiología y Rehabilitación. Todos los derechos reservados.
+      p Desarrollo de Sistemas Web (Back End) - Tecnicatura en Desarrollo de Software
+
+    script(src="https://cdn.jsdelivr.net/npm/flatpickr")
+    script(src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js")
+    script.
+      document.addEventListener('DOMContentLoaded', () => {
+        const btnToggle = document.getElementById('navToggle');
+        const navMenu = document.getElementById('navMenu');
+        if (!btnToggle || !navMenu) return;
+
+        btnToggle.addEventListener('click', () => {
+          const abierto = navMenu.classList.toggle('open');
+          btnToggle.setAttribute('aria-expanded', abierto);
+          const icono = btnToggle.querySelector('i');
+          if (icono) icono.className = abierto ? 'fas fa-times' : 'fas fa-bars';
+        });
+
+        navMenu.querySelectorAll('a').forEach(enlace => {
+          enlace.addEventListener('click', () => {
+            navMenu.classList.remove('open');
+            btnToggle.setAttribute('aria-expanded', 'false');
+            const icono = btnToggle.querySelector('i');
+            if (icono) icono.className = 'fas fa-bars';
+          });
+        });
+      });
+    if !usuarioLogueado || usuarioLogueado.rol === 'paciente'
+      include asistencia.pug

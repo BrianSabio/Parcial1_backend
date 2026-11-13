@@ -21,14 +21,22 @@ Ubicación: ${informacionCIKIRE.ubicacion}
 Descripción: ${informacionCIKIRE.descripcion}
 
 Áreas de trabajo:
-${informacionCIKIRE.areas.join('\n- ')}
+- ${informacionCIKIRE.areas.join('\n- ')}
 
 Servicios confirmados:
-${informacionCIKIRE.serviciosConfirmados.join('\n- ')}
+- ${informacionCIKIRE.serviciosConfirmados.join('\n- ')}
 
 Horarios: ${informacionCIKIRE.horarios ?? 'No informados'}
 Teléfono: ${informacionCIKIRE.telefono ?? 'No informado'}
+WhatsApp: ${informacionCIKIRE.whatsapp ?? 'No informado'}
+Email: ${informacionCIKIRE.email ?? 'No informado'}
 Dirección: ${informacionCIKIRE.direccion ?? 'No informada'}
+
+Aranceles particulares orientativos:
+- Kinesiología General: ${informacionCIKIRE.arancelesParticulares?.kinesiologiaGeneral ?? 'Consultar en recepción'}
+- Kinesiología Pediátrica: ${informacionCIKIRE.arancelesParticulares?.kinesiologiaPediatrica ?? 'Consultar en recepción'}
+- Neurorrehabilitación y Osteopatía: ${informacionCIKIRE.arancelesParticulares?.neurorrehabilitacionYOsteopatia ?? 'Consultar en recepción'}
+- Traumatología y Deportes: ${informacionCIKIRE.arancelesParticulares?.traumatologiaYDeportes ?? 'Consultar en recepción'}
 
 Información sobre turnos:
 ${informacionCIKIRE.turnos}
@@ -84,19 +92,23 @@ function puedeConsultar(socket) {
 export const inicializarChat = (io) => {
   io.on('connection', (socket) => {
     console.log('Cliente conectado al chat:', socket.id);
+
     // Mensaje automático de bienvenida al conectar
     socket.emit('chat:mensaje', {
       texto: "¡Hola! Soy el asistente virtual de CIKIRE. ¿En qué te puedo ayudar hoy?",
       fecha: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     });
+
     // Historial independiente de cada conexión
     socket.data.historial = [];
+
     socket.on('chat:mensaje', async (data) => {
       if (!data || typeof data.texto !== 'string') {
         return;
       }
 
       const texto = data.texto.trim();
+
       // Validar mensaje
       if (!texto || texto.length > MAX_CARACTERES) {
         socket.emit('chat:error', {
@@ -105,27 +117,21 @@ export const inicializarChat = (io) => {
         return;
       }
 
-      if (!texto) {
-        return;
-      }
-      
       const pregunta = texto;
 
-        socket.emit('chat:mensaje', {
+      socket.emit('chat:mensaje', {
         texto: pregunta,
         remitente: 'usuario',
         fecha: new Date().toLocaleTimeString('es-AR', {
-            hour: '2-digit',
-            minute: '2-digit'
+          hour: '2-digit',
+          minute: '2-digit'
         })
-        });
+      });
 
       if (!puedeConsultar(socket)) {
-
         socket.emit('chat:error', {
           texto: 'Alcanzaste el límite de consultas. Intentá nuevamente dentro de un minuto.'
         });
-
         return;
       }
 
@@ -137,8 +143,6 @@ export const inicializarChat = (io) => {
       });
 
       try {
-
-
         socket.emit('chat:estado', {
           escribiendo: true
         });
@@ -152,13 +156,11 @@ export const inicializarChat = (io) => {
             },
             ...historial
           ],
-
-          max_completion_tokens: 350,
+          max_completion_tokens: 500,
           temperature: 0.7
         });
 
-        const respuesta =
-          completion.choices[0]?.message?.content?.trim();
+        const respuesta = completion.choices[0]?.message?.content?.trim();
 
         if (!respuesta) {
           throw new Error('El modelo no generó una respuesta.');
@@ -170,53 +172,38 @@ export const inicializarChat = (io) => {
         });
 
         if (historial.length > MAX_MENSAJES * 2) {
-
-          historial.splice(
-            0,
-            historial.length - MAX_MENSAJES * 2
-          );
-
+          historial.splice(0, historial.length - MAX_MENSAJES * 2);
         }
 
         socket.emit('chat:mensaje', {
-        texto: respuesta,
-        remitente: 'asistente',
-        fecha: new Date().toLocaleTimeString('es-AR', {
+          texto: respuesta,
+          remitente: 'asistente',
+          fecha: new Date().toLocaleTimeString('es-AR', {
             hour: '2-digit',
             minute: '2-digit'
-        })
+          })
         });
 
       } catch (error) {
-
         if (historial.at(-1)?.role === 'user') {
           historial.pop();
         }
 
-        console.error(
-          'Error al comunicarse con Groq:',
-          error.message
-        );
+        console.error('Error al comunicarse con Groq:', error.message);
 
         socket.emit('chat:error', {
           texto: 'El asistente no está disponible en este momento. Intentá nuevamente más tarde.'
         });
-
       } finally {
-
         socket.emit('chat:estado', {
           escribiendo: false
         });
-
       }
-
     });
 
     socket.on('disconnect', () => {
       socket.data.historial = [];
       console.log('Cliente desconectado:', socket.id);
     });
-
   });
-
 };

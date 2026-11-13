@@ -13,6 +13,11 @@
   font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 85px;
+}
+
 body {
   background-color: var(--light-bg);
   color: var(--dark-blue);
@@ -29,6 +34,41 @@ body {
   position: sticky;
   top: 0;
   z-index: 999;
+}
+
+.navbar-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-toggle {
+  display: none;
+  background: transparent;
+  border: 1.5px solid var(--dark-blue);
+  color: var(--dark-blue);
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.nav-toggle:hover {
+  background-color: #e0f7fa;
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+
+.nav-menu {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1;
+  margin-left: 2rem;
 }
 
 .nav-actions {
@@ -78,16 +118,16 @@ body {
   color: var(--white);
 }
 
-/* --- Hero --- */
 .hero {
   position: relative;
   display: flex;
   align-items: center;
-  padding: 8rem 4rem 12rem 4rem; 
+  min-height: 540px;
+  padding: 5.5rem 4rem 9rem 4rem;
   background: 
-    linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.9) 45%, rgba(255,255,255,0) 100%),
-    url("/img/fondo-hero.png") no-repeat center center;
-  background-size: cover; 
+    linear-gradient(90deg, rgba(255,255,255,0.96) 0%, rgba(255,255,255,0.85) 35%, rgba(255,255,255,0) 55%),
+    url("/img/fondo-hero.jpg") no-repeat center center;
+  background-size: cover;
 }
 
 .hero-text {
@@ -330,4 +370,1011 @@ body {
 
 #chatForm button:hover {
   background-color: var(--dark-blue);
+}
+
+/* --- Portal de Autogestión de Turnos (Estilo CIKIRE / TurnoFlex) --- */
+.turnos-page {
+  max-width: 1200px;
+  margin: 2.5rem auto;
+  padding: 0 2rem;
+}
+
+.turnos-header {
+  margin-bottom: 2rem;
+}
+
+.turnos-header h2 {
+  font-size: 2rem;
+  color: var(--dark-blue);
+  margin-bottom: 0.4rem;
+}
+
+.turnos-header p {
+  color: var(--text-gray);
+}
+
+.booking-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 2rem;
+  align-items: start;
+  margin-bottom: 3.5rem;
+}
+
+.sidebar-card {
+  background: var(--white);
+  padding: 1.5rem;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+}
+
+.sidebar-card .form-group {
+  margin-bottom: 1.2rem;
+}
+
+.sidebar-card label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--dark-blue);
+  margin-bottom: 0.5rem;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.65rem 0.9rem;
+  border: 1px solid #d0d7de;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  color: var(--dark-blue);
+  background-color: var(--white);
+  outline: none;
+}
+
+.form-control:focus {
+  border-color: var(--cyan);
+}
+
+.sidebar-divider {
+  border: none;
+  border-top: 1px solid #eee;
+  margin: 1.2rem 0;
+}
+
+.especialidades-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.esp-item {
+  display: flex !important;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 400 !important;
+  cursor: pointer;
+  padding: 0.35rem 0.5rem;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.esp-item:hover {
+  background-color: #e0f7fa;
+}
+
+.esp-item input[type="radio"] {
+  accent-color: var(--cyan);
+  width: 16px;
+  height: 16px;
+}
+
+/* Tarjetas de Profesionales */
+.profesionales-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.prof-card {
+  background: var(--white);
+  border-radius: 15px;
+  padding: 1.5rem 2rem;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 2rem;
+  border: 1px solid #edf2f7;
+}
+
+.prof-info {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  border-right: 1px solid #eee;
+  padding-right: 1rem;
+}
+
+.prof-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background-color: #e0f7fa;
+  color: var(--cyan);
+  font-weight: 700;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.prof-info h4 {
+  color: var(--dark-blue);
+  font-size: 1.05rem;
+  margin-bottom: 0.3rem;
+}
+
+.prof-badge {
+  display: inline-block;
+  background-color: #e0f7fa;
+  color: var(--cyan);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.2rem 0.65rem;
+  border-radius: 12px;
+  margin-bottom: 0.4rem;
+}
+
+.prof-sede {
+  font-size: 0.85rem;
+  color: var(--text-gray);
+}
+
+.fecha-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid #f0f4f8;
+  gap: 1rem;
+}
+
+.fecha-label strong {
+  display: block;
+  color: var(--dark-blue);
+  font-size: 0.95rem;
+}
+
+.fecha-label span {
+  font-size: 0.8rem;
+  color: var(--text-gray);
+}
+
+.slots-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* Exactamente 4 horarios por fila */
+  gap: 0.6rem;
+  flex: 1;
+}
+
+.slot-pill {
+  background-color: var(--white);
+  color: var(--cyan);
+  border: 1.5px solid var(--cyan);
+  border-radius: 8px;
+  padding: 0.45rem 0.6rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.slot-pill:hover:not(:disabled) {
+  background-color: #e0f7fa;
+}
+
+.slot-pill.selected {
+  background-color: var(--cyan);
+  color: var(--white);
+}
+
+.slot-pill.occupied {
+  background-color: #f1f5f9;
+  color: #94a3b8;
+  border-color: #cbd5e1;
+  text-decoration: line-through;
+  cursor: not-allowed;
+}
+
+.prof-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  min-height: 38px;
+}
+
+.hint-text, .sin-agenda {
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.seleccion-resumen {
+  font-size: 0.9rem;
+  color: var(--dark-blue);
+}
+
+/* --- Tabla de Turnos Estilizada --- */
+.mis-turnos-section {
+  background: var(--white);
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+}
+
+.mis-turnos-section h3 {
+  color: var(--dark-blue);
+  margin-bottom: 1.2rem;
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+.listado {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.listado th {
+  background-color: var(--light-bg);
+  color: var(--dark-blue);
+  padding: 1rem;
+  font-weight: 600;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.listado td {
+  padding: 1rem;
+  border-bottom: 1px solid #edf2f7;
+  color: var(--dark-blue);
+}
+
+.estado-badge {
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.estado-reservado {
+  background-color: #e0f7fa;
+  color: var(--cyan);
+}
+
+.estado-cancelado {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+.estado-atendido {
+  background-color: #dcfce7;
+  color: #16a34a;
+}
+
+.btn-cancelar-turno {
+  background-color: transparent;
+  color: #dc2626;
+  border: 1px solid #dc2626;
+  padding: 0.4rem 0.9rem;
+  border-radius: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-cancelar-turno:hover {
+  background-color: #dc2626;
+  color: var(--white);
+}
+
+.date-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.btn-link-clear {
+  background: none;
+  border: none;
+  color: var(--cyan);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  align-self: flex-end;
+  padding: 0;
+}
+
+.btn-link-clear:hover {
+  text-decoration: underline;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-wrapper {
+  flex: 1;
+}
+
+/* --- Vistas Administrativas (Pacientes y Profesionales) --- */
+.admin-page {
+  max-width: 1200px;
+  margin: 2.5rem auto;
+  padding: 0 2rem;
+}
+
+.admin-header {
+  margin-bottom: 2rem;
+}
+
+.admin-header h2 {
+  font-size: 2rem;
+  color: var(--dark-blue);
+  margin-bottom: 0.4rem;
+}
+
+.admin-header p {
+  color: var(--text-gray);
+}
+
+.admin-card {
+  background: var(--white);
+  padding: 1.8rem 2rem;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
+}
+
+.admin-card h3 {
+  color: var(--dark-blue);
+  margin-bottom: 1.2rem;
+  font-size: 1.25rem;
+}
+
+.admin-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.2rem;
+  align-items: end;
+}
+
+.admin-form-grid label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--dark-blue);
+  margin-bottom: 0.4rem;
+}
+
+.admin-form-grid .form-actions {
+  display: flex;
+  justify-content: flex-start;
+}
+
+/* Botones de acción dentro de tablas (Editar / Eliminar) */
+.listado td button {
+  padding: 0.35rem 0.85rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-right: 0.4rem;
+  border: 1px solid var(--cyan);
+  background: transparent;
+  color: var(--cyan);
+  transition: all 0.2s;
+}
+
+.listado td button:hover {
+  background: var(--cyan);
+  color: var(--white);
+}
+
+.listado td button:last-child {
+  border-color: #dc2626;
+  color: #dc2626;
+}
+
+.listado td button:last-child:hover {
+  background: #dc2626;
+  color: var(--white);
+}
+
+/* Buscador rápido de pacientes y estado de sesiones */
+.paciente-search-wrapper {
+  position: relative;
+}
+
+.autocomplete-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  max-height: 210px;
+  overflow-y: auto;
+  z-index: 50;
+  display: none;
+}
+
+.autocomplete-item {
+  padding: 0.6rem 0.85rem;
+  cursor: pointer;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 0.9rem;
+}
+
+.autocomplete-item:hover {
+  background: #f0f9ff;
+}
+
+.paciente-badge-box {
+  margin-top: 0.6rem;
+  padding: 0.65rem 0.85rem;
+  background: #f0f9ff;
+  border-left: 3px solid var(--cyan);
+  border-radius: 6px;
+  font-size: 0.88rem;
+  color: var(--dark-blue);
+}
+
+.cobertura-status-box {
+  margin-top: 0.65rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  font-size: 0.86rem;
+}
+
+.btn-simular-pago {
+  width: 100%;
+  margin-top: 0.4rem;
+  padding: 0.5rem 0.8rem;
+  border-radius: 6px;
+  border: none;
+  background: #0d9488;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-simular-pago:hover {
+  background: #0f766e;
+}
+
+.pago-confirmado-badge {
+  display: inline-block;
+  margin-top: 0.4rem;
+  color: #15803d;
+  font-weight: 700;
+}
+
+/* Calendario Flatpickr con estética CIKIRE */
+.flatpickr-calendar {
+  border-radius: 14px !important;
+  box-shadow: 0 12px 28px rgba(10, 37, 64, 0.16) !important;
+  border: 1px solid #e2e8f0 !important;
+  overflow: hidden;
+  width: 310px !important;
+}
+
+.flatpickr-months {
+  background: var(--dark-blue) !important;
+  padding: 6px 4px !important;
+  align-items: center;
+}
+
+.flatpickr-months .flatpickr-month {
+  background: transparent !important;
+  color: #fff !important;
+  height: 32px !important;
+}
+
+.flatpickr-current-month {
+  font-size: 0.95rem !important;
+  padding-top: 4px !important;
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+}
+
+.flatpickr-current-month .flatpickr-monthDropdown-months {
+  background: var(--dark-blue) !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+  border-radius: 4px;
+}
+
+.flatpickr-current-month input.cur-year {
+  color: #fff !important;
+  font-weight: 600 !important;
+}
+
+.flatpickr-months .flatpickr-prev-month,
+.flatpickr-months .flatpickr-next-month {
+  color: #fff !important;
+  fill: #fff !important;
+  top: 6px !important;
+}
+
+.flatpickr-weekdays {
+  background: #f8fafc !important;
+  padding: 6px 0 !important;
+}
+
+span.flatpickr-weekday {
+  color: var(--dark-blue) !important;
+  font-weight: 700 !important;
+  font-size: 0.8rem !important;
+}
+
+.flatpickr-day.selected,
+.flatpickr-day.selected:hover {
+  background: var(--cyan) !important;
+  border-color: var(--cyan) !important;
+  color: #fff !important;
+}
+
+.flatpickr-day.today {
+  border-color: var(--cyan) !important;
+}
+
+.flatpickr-day.flatpickr-disabled {
+  color: #cbd5e1 !important;
+  cursor: not-allowed !important;
+}
+
+/* Botón Cobrar en tabla de Turnos Registrados */
+.btn-cobrar-tabla {
+  background: #0d9488;
+  color: #fff;
+  border: none;
+  padding: 0.35rem 0.85rem;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-right: 0.4rem;
+  transition: background 0.2s;
+}
+
+.btn-cobrar-tabla:hover {
+  background: #0f766e;
+}
+
+.pago-ok-tag {
+  font-size: 0.82rem;
+  color: #15803d;
+  font-weight: 700;
+}
+
+.btn-cobrar-tabla {
+  background: #0d9488 !important;
+  color: #fff !important;
+  border: 1px solid #0d9488 !important;
+  padding: 0.38rem 0.95rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-cobrar-tabla:hover {
+  background: #0f766e !important;
+}
+
+/* --- Secciones Institucionales: Nosotros y Contacto --- */
+.section-tag {
+  display: inline-block;
+  background-color: #e0f7fa;
+  color: var(--cyan);
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  padding: 0.35rem 0.9rem;
+  border-radius: 20px;
+  margin-bottom: 0.8rem;
+}
+
+.about-section {
+  background-color: var(--white);
+  padding: 5rem 4rem;
+}
+
+.about-container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.about-content h2 {
+  font-size: 2.2rem;
+  color: var(--dark-blue);
+  margin-bottom: 1.2rem;
+}
+
+.about-content p {
+  color: var(--text-gray);
+  font-size: 1.05rem;
+  line-height: 1.7;
+  margin-bottom: 1rem;
+  max-width: 820px;
+}
+
+.about-highlights {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.2rem;
+  margin-top: 2rem;
+}
+
+.highlight-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--light-bg);
+  padding: 1rem 1.2rem;
+  border-radius: 12px;
+  font-weight: 600;
+  color: var(--dark-blue);
+  font-size: 0.95rem;
+}
+
+.highlight-item i {
+  color: var(--cyan);
+  font-size: 1.25rem;
+}
+
+.contact-section {
+  padding: 5rem 4rem;
+  background-color: var(--light-bg);
+}
+
+.contact-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 3rem;
+  align-items: start;
+}
+
+.contact-info h2 {
+  font-size: 2.2rem;
+  color: var(--dark-blue);
+  margin-bottom: 0.8rem;
+}
+
+.contact-info > p {
+  color: var(--text-gray);
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.contact-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1.3rem;
+}
+
+.contact-detail-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.contact-detail-item i {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #e0f7fa;
+  color: var(--cyan);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.contact-detail-item strong {
+  display: block;
+  color: var(--dark-blue);
+  font-size: 0.98rem;
+}
+
+.contact-detail-item span {
+  color: var(--text-gray);
+  font-size: 0.92rem;
+}
+
+.contact-form-card {
+  background: var(--white);
+  padding: 2.2rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+}
+
+.contact-form-card h3 {
+  color: var(--dark-blue);
+  margin-bottom: 1.3rem;
+  font-size: 1.35rem;
+}
+
+.contact-form-card .form-group {
+  margin-bottom: 1.1rem;
+}
+
+.contact-form-card label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--dark-blue);
+  margin-bottom: 0.4rem;
+}
+
+/* =========================================================
+   DISEÑO RESPONSIVE (Tablets y Celulares)
+   ========================================================= */
+
+/* --- Tablets y Notebooks chicas (hasta 992px) --- */
+@media (max-width: 992px) {
+  .navbar {
+    padding: 0.8rem 1.5rem;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+  }
+
+  .hero {
+    padding: 4rem 2rem 7rem 2rem;
+    min-height: 460px;
+    background: 
+      linear-gradient(90deg, rgba(255,255,255,0.96) 0%, rgba(255,255,255,0.88) 48%, rgba(255,255,255,0.2) 85%),
+      url("/img/fondo-hero.jpg") no-repeat 75% center;
+    background-size: cover;
+  }
+
+  .stats-container {
+    padding: 0 2rem;
+  }
+
+  .services {
+    flex-direction: column;
+    padding: 2rem;
+  }
+
+  .services-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .about-section,
+  .contact-section {
+    padding: 3.5rem 2rem;
+  }
+
+  .contact-container {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  /* Portal de Turnos en tablet */
+  .booking-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .prof-card {
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+  }
+
+  .prof-info {
+    border-right: none;
+    border-bottom: 1px solid #eee;
+    padding-right: 0;
+    padding-bottom: 1rem;
+  }
+}
+
+/* --- Celulares (hasta 768px) --- */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0.75rem 1.2rem;
+    position: sticky;
+    top: 0;
+  }
+
+  .navbar-top {
+    width: 100%;
+  }
+
+  .nav-toggle {
+    display: flex;
+  }
+
+  .nav-menu {
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+    margin-left: 0;
+    padding-top: 1rem;
+    margin-top: 0.75rem;
+    border-top: 1px solid #edf2f7;
+  }
+
+  .nav-menu.open {
+    display: flex;
+  }
+
+  .nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    width: 100%;
+  }
+
+  .nav-links a {
+    margin: 0;
+    padding: 0.6rem 0.9rem;
+    border-radius: 10px;
+    font-size: 0.98rem;
+  }
+
+  .nav-links a:hover {
+    background-color: var(--light-bg);
+  }
+
+  .nav-actions {
+    width: 100%;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .nav-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .hero {
+    padding: 3rem 1.5rem 5.5rem 1.5rem;
+    min-height: auto;
+    text-align: center;
+    justify-content: center;
+    background: 
+      linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.88) 65%, rgba(255,255,255,0.75) 100%),
+      url("/img/fondo-hero.jpg") no-repeat 70% center;
+    background-size: cover;
+  }
+
+  .hero-text {
+    max-width: 100%;
+  }
+
+  .hero-text h1 {
+    font-size: 2rem;
+  }
+
+  .hero-text p {
+    font-size: 1.05rem;
+  }
+
+  .divider {
+    margin: 0 auto 1.5rem auto;
+  }
+
+  .stats-container {
+    padding: 0 1.2rem;
+    margin-top: -2.5rem;
+  }
+
+  .stats-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.2rem;
+    padding: 1.5rem;
+  }
+
+  .stat-divider {
+    width: 100%;
+    height: 1px;
+  }
+
+  .services {
+    padding: 1.5rem 1.2rem 3.5rem 1.2rem;
+    margin-top: 1.5rem;
+  }
+
+  .services-intro h2 {
+    font-size: 1.9rem;
+  }
+
+  .services-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .about-section,
+  .contact-section {
+    padding: 2.8rem 1.2rem;
+  }
+
+  .about-content h2,
+  .contact-info h2 {
+    font-size: 1.75rem;
+  }
+
+  .contact-form-card {
+    padding: 1.5rem;
+  }
+
+  /* Portales internos (Turnos, Pacientes, Profesionales, Equipo) */
+  .turnos-page,
+  .admin-page {
+    padding: 0 1rem;
+    margin: 1.5rem auto;
+  }
+
+  .fecha-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .slots-grid {
+    grid-template-columns: repeat(2, 1fr);
+    width: 100%;
+  }
+
+  .admin-card,
+  .mis-turnos-section {
+    padding: 1.2rem;
+  }
+
+  .card-header-flex {
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+}
+
+/* --- Móviles pequeños (hasta 480px) --- */
+@media (max-width: 480px) {
+  .nav-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  #chat-widget {
+    width: calc(100vw - 24px);
+    right: 12px;
+    bottom: 12px;
+  }
+
+  .chat-toggle-btn {
+    right: 12px;
+    bottom: 12px;
+    padding: 0.85rem 1.2rem;
+    font-size: 0.92rem;
+  }
 }

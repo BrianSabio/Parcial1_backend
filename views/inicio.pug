@@ -28,11 +28,11 @@ block content
           strong Obras Sociales
           span y Particulares
 
-  section.services
+  section#especialidades.services
     .services-intro
       h2 Nuestras áreas #[br] de atención
       p Un equipo de profesionales comprometidos con tu rehabilitación integral y bienestar a largo plazo.
-      a.btn.btn-dark(href="#") Conocer más #[i.fas.fa-arrow-right]
+      a.btn.btn-dark(href="#nosotros") Conocer más #[i.fas.fa-arrow-right]
     
     .services-grid
       .service-card
@@ -52,6 +52,86 @@ block content
         h3 Neurorrehabilitación
         p Fisioterapia, osteopatía y drenaje linfático especializado.
 
-  footer.footer
-    p &copy; 2026 CIKIRE - Centro Integral de Kinesiología y Rehabilitación. Todos los derechos reservados.
-    p Desarrollo de Sistemas Web (Back End) - Tecnicatura en Desarrollo de Software
+  //- Sección Nosotros
+  section#nosotros.about-section
+    .about-container
+      .about-content
+        span.section-tag SOBRE CIKIRE
+        h2 Rehabilitación personalizada con enfoque interdisciplinario
+        p En el #[strong Centro Integral de Kinesiología y Rehabilitación (CIKIRE)] acompañamos cada etapa de tu recuperación combinando evaluación clínica, seguimiento continuo y equipamiento terapéutico moderno.
+        p Nuestro equipo trabaja de forma coordinada para optimizar los tiempos de recuperación, prevenir recaídas y garantizar una atención ágil tanto por obra social como de manera particular.
+        .about-highlights
+          .highlight-item
+            i.fas.fa-check-circle
+            span Atención personalizada por especialistas matriculados
+          .highlight-item
+            i.fas.fa-check-circle
+            span Seguimiento digital de sesiones y evolución
+          .highlight-item
+            i.fas.fa-check-circle
+            span Amplia cobertura en obras sociales y prepagas
+
+  //- Sección Contacto con Formulario
+  section#contacto.contact-section
+    .contact-container
+      .contact-info
+        span.section-tag CONTACTO
+        h2 Estamos para ayudarte
+        p Escribinos ante cualquier consulta sobre coberturas, derivaciones médicas o disponibilidad de turnos.
+        
+        .contact-details
+          .contact-detail-item
+            i.fas.fa-map-marker-alt
+            div
+              strong Sede Villa Urquiza
+              span Av. Triunvirato 4250, CABA
+          .contact-detail-item
+            i.fas.fa-clock
+            div
+              strong Horarios de atención
+              span Lunes a Viernes de 08:00 a 20:00 hs · Sábados de 08:00 a 13:00 hs
+          .contact-detail-item
+            i.fas.fa-phone-alt
+            div
+              strong Teléfono y WhatsApp
+              span (011) 4521-8890 · +54 9 11 5555-2454
+          .contact-detail-item
+            i.fas.fa-envelope
+            div
+              strong Correo electrónico
+              span contacto@cikire.com.ar
+
+      .contact-form-card
+        h3 Envianos tu consulta
+        form#formContactoPublico
+          .form-group
+            label(for="contactoNombre") Nombre y Apellido
+            input#contactoNombre.form-control(type="text", placeholder="Ingresá tu nombre completo", required=true)
+          .form-group
+            label(for="contactoEmail") Correo electrónico
+            input#contactoEmail.form-control(type="email", placeholder="Ej: nombre@correo.com", required=true)
+          .form-group
+            label(for="contactoMotivo") Motivo de consulta
+            select#contactoMotivo.form-control
+              option(value="Turnos y disponibilidad") Turnos y disponibilidad
+              option(value="Obras sociales y coberturas") Obras sociales y coberturas
+              option(value="Consultas particulares") Consultas particulares
+              option(value="Otras consultas") Otras consultas
+          .form-group
+            label(for="contactoMensaje") Mensaje
+            textarea#contactoMensaje.form-control(rows="4", placeholder="Contanos brevemente en qué podemos ayudarte...", required=true)
+          button.btn.btn-primary(type="submit", style="width:100%; justify-content:center;") #[i.fas.fa-paper-plane] Enviar mensaje
+        #contactoConfirmacion.cobertura-status-box(style="display:none; margin-top:1rem; border-color:#0d9488; background:#f0fdfa; color:#0f766e;")
+          i.fas.fa-check-circle
+          |  ¡Gracias por escribirnos! Tu consulta fue enviada al equipo de recepción de CIKIRE.
+
+  script.
+    document.getElementById('formContactoPublico')?.addEventListener('submit', function(e) {
+      e.preventDefault();
+      this.reset();
+      const msg = document.getElementById('contactoConfirmacion');
+      if (msg) {
+        msg.style.display = 'block';
+        setTimeout(() => { msg.style.display = 'none'; }, 6000);
+      }
+    });

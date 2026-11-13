@@ -10,12 +10,12 @@ export const obtenerProfesionales = async (req, res, next) => {
       }
       filtro._id = profesionalRef;
     }
-    const profesionales = await Profesional.find(filtro);
+    const profesionales = await Profesional.find(filtro).sort({ apellido: 1, nombre: 1 });
     return res.status(200).json(profesionales);
   } catch (error) {
     next(error);
   }
-  };
+};
 
 export const obtenerProfesionalPorId = async (req, res, next) => {
   try {
@@ -39,7 +39,7 @@ export const obtenerProfesionalPorId = async (req, res, next) => {
 
 export const crearProfesional = async (req, res, next) => {
   try {
-    const { nombre, apellido, especialidad } = req.body;
+    const { nombre, apellido, especialidad, matricula, telefono, email, estado } = req.body;
 
     if (!nombre || !apellido || !especialidad) {
       return res.status(400).json({
@@ -50,7 +50,11 @@ export const crearProfesional = async (req, res, next) => {
     const nuevoProfesional = new Profesional({
       nombre,
       apellido,
-      especialidad
+      especialidad,
+      matricula: matricula || '',
+      telefono: telefono || '',
+      email: email || '',
+      estado: estado || 'activo'
     });
 
     const profesionalGuardado = await nuevoProfesional.save();
@@ -114,7 +118,6 @@ export const mostrarVistaProfesionales = async (req, res, next) => {
   try {
     const { rol, profesionalRef } = req.usuario;
     let filtro = {};
-
 
     if (rol === 'profesional') {
       filtro._id = profesionalRef;

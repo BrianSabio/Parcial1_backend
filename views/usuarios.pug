@@ -1,0 +1,52 @@
+extends layout
+
+block content
+  .admin-page(data-rol=usuarioLogueado.rol)
+    .admin-header
+      h2= usuarioLogueado.rol === 'director' ? 'Gestión de Coordinación' : 'Gestión de Equipo Operativo'
+      p= usuarioLogueado.rol === 'director' ? 'Alta y habilitación de coordinadores de CIKIRE.' : 'Alta y habilitación de personal administrativo, recepción y profesionales.'
+
+    .admin-card
+      h3= usuarioLogueado.rol === 'director' ? 'Dar de Alta Coordinador' : 'Dar de Alta Usuario del Equipo'
+      form#formUsuarioEquipo.admin-form-grid
+        .form-group
+          label(for="nombre") Nombre
+          input#nombre.form-control(type="text", placeholder="Ingresá el nombre", required=true)
+
+        .form-group
+          label(for="apellido") Apellido
+          input#apellido.form-control(type="text", placeholder="Ingresá el apellido", required=true)
+
+        .form-group
+          label(for="usuario") Usuario de acceso
+          input#usuario.form-control(type="text", placeholder="Ej: crodriguez", required=true)
+
+        .form-group
+          label(for="password") Contraseña inicial
+          input#password.form-control(type="password", placeholder="Mínimo 6 caracteres", required=true)
+
+        .form-group
+          label(for="rol") Rol asignado
+          select#rol.form-control(required=true)
+            if usuarioLogueado.rol === 'director'
+              option(value="coordinador", selected=true) Coordinador
+            else
+              option(value="administrativo") Administrativo
+              option(value="recepcionista") Recepcionista
+              option(value="profesional") Profesional
+
+        if usuarioLogueado.rol === 'coordinador'
+          .form-group#grupoProfRef(style="display:none;")
+            label(for="profesionalRef") Vincular ficha de Profesional
+            select#profesionalRef.form-control
+              option(value="") Seleccionar profesional...
+
+        .form-actions
+          button.btn.btn-primary(type="submit") Crear Usuario
+
+    .admin-card
+      h3 Usuarios Registrados
+      div#contenedorUsuariosEquipo.table-responsive
+        p.vacio Cargando equipo...
+
+  script(src="/js/usuarios.js")

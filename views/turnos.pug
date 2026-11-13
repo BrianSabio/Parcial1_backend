@@ -1,38 +1,71 @@
 extends layout
 
 block content
-  h2 Gestión de Turnos
+  .turnos-page(data-rol=usuarioLogueado.rol, data-paciente-id=usuarioLogueado.pacienteRef || '')
+    .turnos-header
+      h2= usuarioLogueado.rol === 'paciente' ? 'Mis Turnos' : 'Gestión de Turnos'
+      p= usuarioLogueado.rol === 'paciente' ? 'Elegí una especialidad, seleccioná tu horario disponible y reservá en un clic.' : (usuarioLogueado.rol === 'profesional' ? 'Consultá tu agenda de pacientes asignados y registrá la atención.' : 'Administración centralizada de agendas y turnos de CIKIRE.')
 
-  h3 Asignar nuevo turno
-  form#formTurno
-    .form-group
-      label(for="fecha") Fecha:
-      input#fecha(type="date", required=true)
-    .form-group
-      label(for="hora") Hora:
-      input#hora(type="time", required=true)
-    .form-group
-      label(for="pacienteId") Paciente (ID):
-      input#pacienteId(type="text", required=true)
-    .form-group
-      label(for="profesionalId") Profesional (ID):
-      input#profesionalId(type="text", required=true)
-    .form-group
-      label(for="servicioId") Servicio (ID):
-      input#servicioId(type="text", required=true)
-    button(type="submit") Guardar Turno
+    if usuarioLogueado.rol !== 'profesional' && usuarioLogueado.rol !== 'director'
+      .booking-layout
+        //- Panel Izquierdo: Buscador de Paciente, Cobertura, Día y Especialidad
+        aside.booking-sidebar
+          .sidebar-card
+            if usuarioLogueado.rol !== 'paciente'
+              .form-group.paciente-search-wrapper
+                label(for="buscadorPacienteAdmin") 1. Buscar Paciente
+                input#buscadorPacienteAdmin.form-control(type="text", placeholder="Buscar por DNI, apellido o nombre...", autocomplete="off")
+                input#selectPacienteAdmin(type="hidden")
+                #resultadosPacienteAdmin.autocomplete-dropdown
+                #infoPacienteSeleccionado.paciente-badge-box(style="display:none;")
 
-  p.vacio#sinTurnos No hay turnos reservados todavía.
+            .form-group
+              label(for="selectServicio")= usuarioLogueado.rol === 'paciente' ? '1. Cobertura' : '2. Cobertura'
+              select#selectServicio.form-control
+                option(value="") Cargando cobertura...
+              #estadoCoberturaBox.cobertura-status-box(style="display:none;")
 
-  table.listado#tablaTurnos
-    thead
-      tr
-        th Fecha
-        th Hora
-        th Paciente
-        th Profesional
-        th Estado
-        th Acciones
-    tbody#cuerpoTablaTurnos
+            .form-group
+              label(for="filtroFecha")= usuarioLogueado.rol === 'paciente' ? '2. Fecha de atención' : '3. Fecha de atención'
+              .date-filter-group
+                input#filtroFecha.form-control(type="text", placeholder="Seleccionar fecha...")
+                button#btnLimpiarFecha.btn-link-clear(type="button", title="Ver todas las fechas") Ver todas
+                
+            .form-group
+              label(for="buscadorProf")= usuarioLogueado.rol === 'paciente' ? '3. Buscar profesional' : '4. Buscar profesional'
+              input#buscadorProf.form-control(type="text", placeholder="Buscar por apellido o nombre...")
+
+            hr.sidebar-divider
+
+            .especialidades-box
+              label= usuarioLogueado.rol === 'paciente' ? '4. Especialidad' : '5. Especialidad'
+              #listaEspecialidades.especialidades-list
+                label.esp-item
+                  input(type="radio", name="filtroEspecialidad", value="todas", checked=true)
+                  span Todas las áreas
+
+        //- Panel Derecho: Tarjetas de Profesionales y Píldoras de Horarios
+        main.booking-results
+          #contenedorProfesionales.profesionales-cards
+            p.loading-text Cargando profesionales y agendas disponibles...
+
+    //- Sección Inferior: Listado de Turnos Reservados
+    section.mis-turnos-section
+      h3= usuarioLogueado.rol === 'paciente' ? 'Historial y Próximos Turnos' : 'Turnos Registrados'
+      p.vacio#sinTurnos No hay turnos reservados todavía.
+
+      .table-responsive
+        table.listado#tablaTurnos
+          thead
+            tr
+              th Fecha
+              th Hora
+              if usuarioLogueado.rol !== 'paciente'
+                th Paciente
+              th Profesional
+              th Estado
+              if usuarioLogueado.rol !== 'director'
+                th Acciones
+          tbody#cuerpoTablaTurnos
 
   script(src="/js/turnos.js")

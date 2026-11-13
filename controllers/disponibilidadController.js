@@ -1,6 +1,5 @@
 import Disponibilidad from '../models/Disponibilidad.js';
 
-
 export const obtenerDisponibilidades = async (req, res, next) => {
   try {
     const { rol, profesionalRef } = req.usuario;

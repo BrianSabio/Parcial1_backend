@@ -4,10 +4,11 @@ export const informacionCIKIRE = {
   nombreCompleto:
     'Centro Integral de Kinesiología y Rehabilitación',
 
-  ubicacion: 'Villa Urquiza, Ciudad Autónoma de Buenos Aires (con acceso directo por línea B de subte, ferrocarril Mitre y colectivos)',
+  ubicacion:
+    'Av. Triunvirato 4250, Villa Urquiza, Ciudad Autónoma de Buenos Aires (con acceso directo por línea B de subte, ferrocarril Mitre y colectivos)',
 
   descripcion:
-    'Centro dedicado a la atención kinésica y la rehabilitación.',
+    'Centro dedicado a la atención kinésica y la rehabilitación integral con enfoque interdisciplinario.',
 
   areas: [
     'Kinesiología General (rehabilitación post-quirúrgica y tratamientos recurrentes)',
@@ -16,23 +17,32 @@ export const informacionCIKIRE = {
   ],
 
   serviciosConfirmados: [
-    'Atención en kinesiología general',
-    'Atención en kinesiología especializada',
-    'Sesiones individuales de kinesiología',
-    'Paquetes o abonos de sesiones (con control automático de créditos y vigencia de 12 meses)',
-    'Atención por convenios con obras sociales, prepagas  y particulares',
-    'Gestión de turnos y recordatorios automáticos',
-    'Seguimiento de pacientes y control de evolución',
-    'Gestión de profesionales y disponibilidad de turnos',
-    'Gestión de pagos y facturación'
+    'Atención en kinesiología general (sesiones de 45 min)',
+    'Atención en kinesiología especializada (Traumatología 30 min; Pediátrica y Neurorrehabilitación/Osteopatía 45 min)',
+    'Sesiones individuales y paquetes o abonos de sesiones con control automático de créditos',
+    'Atención por convenios con obras sociales, prepagas y consultas particulares',
+    'Gestión de turnos online y recordatorios automáticos',
+    'Seguimiento digital de pacientes y control de evolución'
   ],
 
-  horarios: 'Lunes a viernes de 07:00 a 21:00 hs y sábados de 08:00 a 14:00 hs.',
+  arancelesParticulares: {
+    kinesiologiaGeneral: '$25.000 por sesión',
+    kinesiologiaPediatrica: '$28.000 por sesión',
+    neurorrehabilitacionYOsteopatia: '$32.000 por sesión',
+    traumatologiaYDeportes: '$35.000 por consulta'
+  },
 
-  telefono: '11 1234-5678',
+  horarios:
+    'Lunes a viernes de 08:00 a 20:00 hs y sábados de 08:00 a 13:00 hs. Cerrado domingos y feriados nacionales.',
 
-  direccion: 'Villa Urquiza, CABA',
+  telefono: '(011) 4521-8890',
+
+  whatsapp: '+54 9 11 5555-2454',
+
+  email: 'contacto@cikire.com.ar',
+
+  direccion: 'Av. Triunvirato 4250, Villa Urquiza, CABA',
 
   turnos:
-    'Los turnos se pueden solicitar de forma presencial en la clínica, por teléfono o de manera virtual a través de nuestra web mediante el portal de autogestión TurnoFlex (canal prioritario y recomendado para una asignación inmediata y sin esperas). El sistema valida automáticamente la disponibilidad del profesional y el saldo de tu paquete de sesiones.'
+    'Los turnos se pueden solicitar de forma presencial en la clínica, por teléfono/WhatsApp o de manera virtual a través de nuestra web mediante el portal de autogestión (canal prioritario para asignación inmediata). El sistema valida automáticamente la disponibilidad del profesional activo y el saldo de tu paquete de sesiones.'
 };
