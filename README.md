@@ -1,144 +1,242 @@
-# CIKIRE - API de Gestión de Turnos
+# CIKIRE — Sistema de gestión de turnos
 
-API REST desarrollada con Node.js y Express para digitalizar el proceso de reservas de turnos de CIKIRE, un centro de atención que ofrece sesiones individuales y paquetes de sesiones con distintos profesionales.
+Aplicación web monolítica desarrollada para la materia **Desarrollo de
+Sistemas Web Back-End 2A** de la **Tecnicatura Superior en Desarrollo de
+Software — IFTS 29**. El proyecto fue realizado por el equipo TetraCode:
+Berzuini, Flavia; Bustamante, Pedro; Quiroz, Ludmila; y Sabio, Brian.
 
-## Equipo
+CIKIRE digitaliza la gestión de pacientes, profesionales, disponibilidades,
+servicios/paquetes y turnos de un centro de kinesiología y rehabilitación.
 
-Proyecto desarrollado de forma colaborativa por:
+## Estado actual
 
-- Berzuini, Flavia Paola
-- Bustamante, Pedro Matías
-- Quiroz, Ludmila Mayra
-- Sabio, Brian Ezequiel
+La versión vigente es un MVP académico funcional con:
 
-## ¿Qué resuelve?
+- API REST en Express.
+- MongoDB mediante Mongoose.
+- Vistas Pug y scripts de cliente con Fetch.
+- Autenticación JWT en cookie `HttpOnly`.
+- Hash de contraseñas con `bcrypt`.
+- Autorización por roles.
+- Socket.IO y asistente informativo conectado a Groq.
+- Landing institucional.
 
-Actualmente las reservas se manejan de forma informal (planillas, WhatsApp), lo que genera turnos duplicados, errores de horario y dificultad para cancelar o consultar reservas. Este sistema digitaliza el proceso de gestión de reservas: recepción de la solicitud, verificación de disponibilidad del profesional y asignación del turno. También incluye tablas dinámicas para la gestión de pacientes y profesionales.
+El documento técnico completo se encuentra en
+[`docs/documento_tecnico.md`](docs/documento_tecnico.md).
 
 ## Tecnologías
 
-- Node.js + Express
-- Persistencia en MongoDB con Mongoose
-- Pug como motor de plantillas
-- Autenticación con JWT en cookies `HttpOnly`
-- Contraseñas protegidas con `bcrypt`
+| Componente | Tecnología |
+|---|---|
+| Runtime | Node.js |
+| HTTP | Express |
+| Base de datos | MongoDB |
+| ODM | Mongoose |
+| Plantillas | Pug |
+| Autenticación | `jsonwebtoken` + `bcrypt` |
+| Tiempo real | Socket.IO |
+| Asistente | Groq API mediante cliente OpenAI-compatible |
+| Configuración | dotenv |
+| Desarrollo | nodemon |
+
+La dependencia instalada es `bcrypt`, no `bcryptjs`.
 
 ## Arquitectura
 
-El proyecto sigue una estructura MVC adaptada, con persistencia en MongoDB:
+El proyecto sigue un MVC liviano:
 
+```text
+config/        # MongoDB, Groq y Socket.IO
+controllers/   # Reglas de negocio y acceso a datos
+data/          # Información institucional del asistente
+middlewares/   # JWT, roles y errores
+models/        # Esquemas Mongoose
+public/        # CSS, imágenes y JavaScript del navegador
+routes/        # Endpoints Express
+sockets/       # Eventos Socket.IO del chat
+utils/         # Utilidades JWT
+views/         # Plantillas Pug
+docs/          # Documentación técnica
 ```
-proyecto/
-├── models/         # Esquemas y Modelos de Mongoose (MongoDB)
-├── controllers/     # Lógica de negocio y validaciones
-├── routes/           # Endpoints Express, delegan en los controllers
-├── middlewares/      # Middlewares de autenticación y manejo de errores
-├── config/           # Configuración de la conexión a MongoDB
-├── utils/            # Utilidades, incluyendo JWT
-├── views/            # Plantillas Pug
-├── public/           # Scripts del cliente
-└── docs/             # Documentación y diagramas del proyecto
-```
 
-**Regla de diseño**: los models definen los esquemas de datos. La persistencia y las reglas de negocio viven en los controllers.
+La estructura detallada está en
+[`docs/estructura_carpetas.md`](docs/estructura_carpetas.md) y el modelo en
+[`docs/modelo_datos.md`](docs/modelo_datos.md).
 
-## Entidades
+## Funcionalidades
 
-- **Pacientes**: datos personales de quien solicita atención.
-- **Profesionales**: quienes brindan las sesiones.
-- **Disponibilidad**: bloques horarios de cada profesional.
-- **Servicios**: sesión individual o paquete de sesiones contratado por un paciente.
-- **Turnos**: reserva concreta que vincula paciente, profesional, servicio, fecha y hora.
+- Registro público de pacientes.
+- Login y logout.
+- JWT firmado en cookie `HttpOnly`.
+- Migración oportunista de contraseñas heredadas a bcrypt.
+- Roles: paciente, recepcionista, profesional, administrativo, coordinador y
+  director.
+- Gestión de pacientes.
+- Gestión de profesionales y estado activo/inactivo.
+- Gestión de disponibilidades y detección de solapamientos al crear.
+- Gestión de servicios y saldo de sesiones.
+- Reserva con validación de pertenencia del servicio, saldo, disponibilidad y
+  conflicto horario.
+- Cancelación con devolución de sesión.
+- Atención de turnos por profesionales.
+- Alta y estado de usuarios internos con jerarquía.
+- Chat institucional con historial máximo de 10 mensajes y límite de 8
+  consultas por minuto por conexión.
+- Landing institucional con formulario de contacto simulado en el navegador.
 
-## Reglas de negocio principales
+## Modelo de dominio
 
-- Un profesional no puede tener dos turnos en el mismo horario.
-- Solo se pueden reservar horarios marcados como disponibles.
-- Un turno puede estar en estado `reservado`, `cancelado` o `atendido`.
-- Cancelar un turno libera la disponibilidad y devuelve la sesión consumida del paquete.
-- Un servicio de tipo paquete no permite reservar turnos si ya no tiene sesiones disponibles.
+Las entidades principales son `Usuario`, `Paciente`, `Profesional`,
+`Disponibilidad`, `Servicio` y `Turno`. Las relaciones usan `ObjectId` de
+MongoDB. Los esquemas y sus reglas se describen en
+[`docs/modelo_datos.md`](docs/modelo_datos.md).
 
-## Identificadores
+## Instalación y ejecución
 
-Los ids son generados y administrados por MongoDB mediante ObjectId, incluidas las relaciones (`pacienteId`, `profesionalId`, `servicioId`).
+Requisitos:
 
-## Instalación
+- Node.js.
+- MongoDB local o MongoDB Atlas.
+- Clave de Groq para habilitar el chat.
+
+Instalar dependencias:
 
 ```bash
 npm install
 ```
 
-Copiar `.env.example` como `.env` y configurar al menos `MONGODB_URI`, `JWT_SECRET` y
-`JWT_EXPIRES_IN`.
+Crear `.env` a partir de `.env.example`:
 
-> **Advertencia:** el registro público permite seleccionar cualquiera de los roles
-> definidos por el modelo. En un entorno real, la creación de usuarios con roles
-> privilegiados debería restringirse a usuarios autorizados.
-
-## Ejecución
-
-```bash
-npm run dev    # con nodemon, reinicio automático
-npm start       # sin nodemon
+```env
+MONGODB_URI=mongodb://localhost:27017/cikire
+PORT=3000
+JWT_SECRET=replace-with-a-long-random-secret
+JWT_EXPIRES_IN=1h
+NODE_ENV=development
+GROQ_API_KEY=replace-with-your-groq-api-key
 ```
 
-El servidor levanta por defecto en el puerto `3000`.
+Iniciar en desarrollo:
+
+```bash
+npm run dev
+```
+
+Iniciar sin nodemon:
+
+```bash
+npm start
+```
+
+La aplicación queda disponible por defecto en `http://localhost:3000`.
 
 ## Autenticación y autorización
 
-El sistema utiliza JWT para autenticar a los usuarios. Después de validar las
-credenciales, el servidor genera un token firmado y lo envía en una cookie
-`HttpOnly`. En cada solicitud protegida, el middleware valida el token y carga el
-usuario autenticado en `req.usuario`.
+El login valida un usuario activo, compara la contraseña con bcrypt y emite un
+JWT. El middleware
+[`middlewares/loginHandler.js`](middlewares/loginHandler.js) carga el token,
+protege rutas y verifica los roles permitidos.
 
-El acceso a las operaciones se controla mediante roles. Las rutas aplican primero
-el middleware de autenticación y luego verifican los roles permitidos:
+La cookie utiliza `HttpOnly`, `SameSite=Lax` y `Secure` en producción. El
+logout elimina la cookie del navegador. No hay refresh tokens ni lista de
+revocación; un token copiado continúa siendo válido hasta expirar. Tampoco se
+revalida el estado/rol del usuario contra MongoDB en cada request.
 
-- `paciente`: puede consultar profesionales, disponibilidades, servicios y
-  gestionar sus turnos.
-- `profesional`: puede consultar pacientes, profesionales, disponibilidades,
-  servicios y turnos, y puede atender turnos.
-- `administrativo`: puede gestionar pacientes, profesionales, disponibilidades,
-  servicios y turnos.
-- `recepcionista`, `coordinador` y `director`: están definidos en el modelo de
-  usuario, pero deben recibir permisos explícitos en las rutas si se requieren.
+La autorización por rol está implementada a nivel de endpoint, pero la
+pertenencia del recurso no está verificada de forma uniforme en todos los
+controladores. Esto es deuda técnica conocida y se detalla en el documento de
+estado.
 
-Las contraseñas nuevas se almacenan mediante `bcrypt`. Las contraseñas antiguas
-en texto plano se convierten automáticamente a un hash seguro cuando el usuario
-inicia sesión correctamente.
+## Endpoints
 
-Al cerrar sesión, el servidor envía una instrucción para eliminar la cookie JWT
-del navegador y redirige al login. Como los JWT son autocontenidos, un token
-copiado por un tercero seguiría siendo válido hasta su vencimiento; este proyecto
-no implementa una lista de revocación ni refresh tokens.
+### Login
 
-## Endpoints principales
+| Método | Ruta | Descripción |
+|---|---|---|
+| GET | `/login` | Formulario de login |
+| POST | `/login` | Autenticar y emitir JWT |
+| GET | `/login/registro` | Formulario de registro |
+| POST | `/login/registro` | Registrar paciente o alta autorizada |
+| GET | `/login/logout` | Eliminar cookie y redirigir |
 
-| Entidad | Endpoints |
+### API
+
+| Recurso | Rutas |
 |---|---|
-| Pacientes | `GET /api/pacientes`, `GET /api/pacientes/:id`, `POST /api/pacientes`, `PUT /api/pacientes/:id`, `DELETE /api/pacientes/:id` |
-| Profesionales | `GET /api/profesionales`, `GET /api/profesionales/:id`, `POST /api/profesionales`, `PUT /api/profesionales/:id`, `DELETE /api/profesionales/:id` |
-| Disponibilidad | `GET /api/disponibilidad`, `GET /api/disponibilidad/:id`, `POST /api/disponibilidad`, `PUT /api/disponibilidad/:id`, `DELETE /api/disponibilidad/:id` |
-| Servicios | `GET /api/servicios`, `GET /api/servicios/:id`, `POST /api/servicios`, `PUT /api/servicios/:id`, `DELETE /api/servicios/:id`, `GET /api/servicios/estado/:pacienteId` (consulta: sesiones totales/consumidas/restantes de un paciente) |
-| Turnos | `GET /api/turnos`, `GET /api/turnos/:id`, `POST /api/turnos`, `PUT /api/turnos/:id`, `PATCH /api/turnos/:id/cancelar`, `PATCH /api/turnos/:id/atender`, `DELETE /api/turnos/:id`, `GET /api/turnos/paciente/:pacienteId` (consulta: turnos de un paciente), `GET /api/turnos/profesional/:profesionalId` (consulta: agenda de un profesional) |
-| Vista | `GET /vista/turnos`, `GET /vista/pacientes`, `GET /vista/profesionales`, `GET /login`, `GET /login/registro`, `GET /login/logout` (vistas Pug de turnos, pacientes, profesionales, login y registro) |
+| Pacientes | CRUD en `/api/pacientes` |
+| Profesionales | CRUD en `/api/profesionales` |
+| Disponibilidad | CRUD en `/api/disponibilidad` |
+| Servicios | CRUD en `/api/servicios`; estado en `/api/servicios/estado/:pacienteId` |
+| Turnos | CRUD en `/api/turnos`; `/cancelar`, `/atender`, consultas por paciente/profesional |
+| Usuarios | GET/POST `/api/usuarios`; PATCH `/api/usuarios/:id/estado` |
 
-## Vista Pug
+Detalle de roles por ruta y reglas en
+[`docs/estado_actual_sistema.md`](docs/estado_actual_sistema.md).
 
-`views/layout.pug` define la base común de la página (usa herencia de plantillas con `extends`/`block content`). `views/turnos.pug`, `views/pacientes.pug` , `views/profesionales.pug` , `views/login.pug` y `views/registro.pug` extienden ese layout y muestran las tablas correspondientes.
+### Vistas
 
-## Pruebas
+- `/`
+- `/vista/turnos`
+- `/vista/pacientes`
+- `/vista/profesionales`
+- `/vista/usuarios`
 
-Los endpoints se probaron con Postman. La documentación de cada request (endpoint, método, parámetros, body, respuesta esperada y respuesta ante error) se encuentra en el documento de entrega del proyecto.
+## Chat y landing
 
-## DOCS
+Socket.IO se inicializa junto con el servidor HTTP. El asistente utiliza
+información institucional de [`data/informacionCIKIRE.js`](data/informacionCIKIRE.js)
+y consulta Groq desde [`sockets/chatSocket.js`](sockets/chatSocket.js).
 
-En la raíz de carpetas del sistema se encuentra una llamada "docs", en donde se presentan documentos y diagramas del proyecto.
+El formulario de contacto de la landing es actualmente una simulación de
+frontend: muestra confirmación, pero no persiste ni envía el mensaje.
 
-## Alcance
+## Pruebas y calidad
 
-El proyecto ofrece una solución integral para la gestión de pacientes,
-profesionales, disponibilidades, servicios y turnos. Incluye una API REST con
-persistencia en MongoDB, vistas dinámicas con Pug y Fetch, validaciones de las
-reglas principales del negocio, autenticación con JWT mediante cookies `HttpOnly`,
-contraseñas protegidas con `bcrypt` y control de accesos basado en roles.
+La entrega documenta pruebas manuales con Postman sobre el entorno local y el
+despliegue. El repositorio no contiene pruebas automatizadas, lint, build ni
+CI. La sintaxis JavaScript de los archivos versionados se puede verificar con:
+
+```bash
+node --check index.js
+```
+
+Para una evaluación completa se recomienda agregar tests de autorización,
+reglas de reserva, concurrencia, validaciones y seguridad.
+
+## Seguridad y deuda técnica conocida
+
+- Autorización por pertenencia de recurso incompleta en algunos turnos y
+  servicios.
+- Reserva y actualización de saldo sin transacción MongoDB.
+- Fechas y horas almacenadas como strings sin validación centralizada.
+- CORS de Socket.IO abierto y chat sin autenticación.
+- Ausencia de CSRF, headers de seguridad y rate limit HTTP global.
+- Uso de `innerHTML` con datos externos en scripts del frontend.
+- Cobro de consultas particulares no persistente.
+- Formulario de contacto sin backend.
+- Sin health checks, métricas, auditoría ni backups en el repositorio.
+
+Estas limitaciones no se ocultan: forman parte del estado técnico documentado
+para la entrega académica.
+
+## Despliegue informado
+
+La documentación final del equipo informa un despliegue en Render con
+MongoDB Atlas:
+
+- GitHub: <https://github.com/BrianSabio/Parcial1_backend>
+- Render: <https://parcial1-backend-4bb7.onrender.com/>
+
+El despliegue requiere configurar las variables de entorno fuera del
+repositorio.
+
+## Documentación del proyecto
+
+- [`docs/estado_actual_sistema.md`](docs/estado_actual_sistema.md)
+- [`docs/estructura_carpetas.md`](docs/estructura_carpetas.md)
+- [`docs/modelo_datos.md`](docs/modelo_datos.md)
+
+## Licencia y uso académico
+
+Proyecto académico para la materia Desarrollo de Sistemas Web Back-End 2A.
+Las claves, credenciales y datos reales no deben incorporarse al repositorio.
