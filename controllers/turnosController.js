@@ -241,7 +241,7 @@ export const mostrarVistaTurnos = async (req, res, next) => {
     const { rol, pacienteRef, profesionalRef } = req.usuario;
     let filtro = {};
 
-    // Aplicamos la misma lógica de filtrado para las vistas HTML/EJS
+    // Aplicamos la misma lógica de filtrado para las vistas HTML/Pug
     if (rol === 'paciente') {
       filtro.pacienteId = pacienteRef;
     } else if (rol === 'profesional') {

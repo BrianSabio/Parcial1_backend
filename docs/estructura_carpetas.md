@@ -28,10 +28,9 @@ Parcial1_backend/
 │   └── informacionCIKIRE.js         # Contexto institucional del asistente
 │
 ├── docs/
-│   ├── estado_actual_sistema.md     # Estado técnico, riesgos y plan recomendado
+│   ├── documento_tecnico.md     # Estado técnico, riesgos y plan recomendado
 │   ├── modelo_datos.md              # Entidades, relaciones y reglas de integridad
-│   ├── estructura_carpetas.md       # Este documento
-│   └── cronologia_commits_proyecto.md # Evolución del repositorio
+│   └── estructura_carpetas.md       # Este documento
 │
 ├── middlewares/
 │   ├── loginHandler.js              # JWT opcional, autenticación y roles

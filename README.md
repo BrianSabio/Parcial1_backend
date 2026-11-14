@@ -1,4 +1,4 @@
-# CIKIRE — Sistema de gestión de turnos
+# CIKIRE - Sistema de gestión de turnos
 
 Aplicación web monolítica desarrollada para la materia **Desarrollo de
 Sistemas Web Back-End 2A** de la **Tecnicatura Superior en Desarrollo de
@@ -144,8 +144,8 @@ revalida el estado/rol del usuario contra MongoDB en cada request.
 
 La autorización por rol está implementada a nivel de endpoint, pero la
 pertenencia del recurso no está verificada de forma uniforme en todos los
-controladores. Esto es deuda técnica conocida y se detalla en el documento de
-estado.
+controladores. Esto es deuda técnica conocida y se detalla en el
+[documento técnico](docs/documento_tecnico.md).
 
 ## Endpoints
 
@@ -171,7 +171,7 @@ estado.
 | Usuarios | GET/POST `/api/usuarios`; PATCH `/api/usuarios/:id/estado` |
 
 Detalle de roles por ruta y reglas en
-[`docs/estado_actual_sistema.md`](docs/estado_actual_sistema.md).
+[`docs/documento_tecnico.md`](docs/documento_tecnico.md).
 
 ### Vistas
 
@@ -232,7 +232,7 @@ repositorio.
 
 ## Documentación del proyecto
 
-- [`docs/estado_actual_sistema.md`](docs/estado_actual_sistema.md)
+- [`docs/documento_tecnico.md`](docs/documento_tecnico.md)
 - [`docs/estructura_carpetas.md`](docs/estructura_carpetas.md)
 - [`docs/modelo_datos.md`](docs/modelo_datos.md)
 
