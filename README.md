@@ -2,7 +2,7 @@
 
 Aplicación web monolítica desarrollada para la materia **Desarrollo de
 Sistemas Web Back-End 2A** de la **Tecnicatura Superior en Desarrollo de
-Software — IFTS 29**. El proyecto fue realizado por el equipo TetraCode:
+Software - IFTS 29**. El proyecto fue realizado por el equipo TetraCode:
 Berzuini, Flavia; Bustamante, Pedro; Quiroz, Ludmila; y Sabio, Brian.
 
 CIKIRE digitaliza la gestión de pacientes, profesionales, disponibilidades,
@@ -38,8 +38,6 @@ El documento técnico completo se encuentra en
 | Asistente | Groq API mediante cliente OpenAI-compatible |
 | Configuración | dotenv |
 | Desarrollo | nodemon |
-
-La dependencia instalada es `bcrypt`, no `bcryptjs`.
 
 ## Arquitectura
 
