@@ -2,7 +2,8 @@
 
 ## 1. Propósito y alcance
 
-Este documento describe el estado verificable del sistema CIKIRE luego de la
+Este documento describe el estado verificable de TurnoFlex, la solución
+desarrollada para la clínica CIKIRE, luego de la
 tercera entrega. Se elaboró mediante revisión del código vigente, los modelos,
 las rutas, los controladores, las vistas, los scripts del cliente, la
 configuración y la documentación del repositorio.
@@ -22,7 +23,8 @@ transaccional y la seguridad del frontend.
 
 ## 2. Contexto del producto
 
-CIKIRE representa un centro integral de kinesiología y rehabilitación. El
+TurnoFlex representa la solución de gestión para CIKIRE, un centro integral de
+kinesiología y rehabilitación. El
 objetivo es reemplazar la gestión informal de turnos mediante planillas,
 mensajería y procesos manuales por una aplicación web centralizada.
 
@@ -149,15 +151,24 @@ centralizados ni migraciones.
 [`sockets/chatSocket.js`](../sockets/chatSocket.js) implementa:
 
 - Mensaje de bienvenida.
-- Historial independiente por conexión.
-- Máximo de 10 mensajes conservados.
+- Historial independiente por conexión, que se elimina al desconectarse.
+- Conservación de hasta 10 intercambios conversacionales, equivalentes a un
+  máximo de 20 mensajes de usuario/asistente.
 - Mensajes de hasta 1000 caracteres.
 - Límite de 8 consultas por minuto por socket.
 - Respuestas en español con contexto institucional.
-- Integración con Groq mediante el cliente OpenAI-compatible.
+- Guardrails en el prompt para limitar el asistente a información
+  institucional y evitar diagnósticos o indicaciones médicas.
+- Integración con Groq mediante el cliente OpenAI-compatible de OpenAI, usando
+  `https://api.groq.com/openai/v1` como `baseURL` y el modelo
+  `openai/gpt-oss-20b`.
 
-El límite es local al proceso y a cada conexión; no constituye un rate limit
-distribuido.
+La conexión Socket.IO es pública y no requiere autenticación. Las respuestas
+se envían con `socket.emit` al socket que realizó la consulta y el historial
+no se comparte con otras conexiones; esto aísla las conversaciones por
+conexión, pero no constituye autenticación ni una garantía de privacidad de
+identidad. El límite es local al proceso y a cada conexión; no constituye un
+rate limit distribuido.
 
 ## 6. Modelo de datos vigente
 
@@ -426,9 +437,31 @@ agregó bcrypt y adaptó las rutas de API y vistas al nuevo middleware.
 
 ### Incorporación del asistente
 
-Pedro incorporó Socket.IO y la comunicación en tiempo real. Flavia integró el
-asistente institucional, migrándolo de Gemini a Groq, además de la landing
-page.
+Pedro incorporó la infraestructura Socket.IO y la comunicación en tiempo real.
+Flavia participó en la integración del asistente institucional, su migración
+de Gemini a Groq, la definición del comportamiento del prompt y el desarrollo
+de la landing page.
+
+### Distribución declarada de responsabilidades
+
+La siguiente distribución corresponde a las responsabilidades declaradas por
+el equipo para la entrega final. Se describen sólo actividades relacionadas
+con componentes presentes en el repositorio:
+
+- **Berzuini, Flavia:** diseño de la matriz RBAC y aplicación de permisos en
+  vistas y rutas; gestión de usuarios internos y estado de profesionales;
+  reglas de negocio para turnos, servicios y disponibilidades; integración
+  funcional del asistente con Groq, incluyendo el prompt institucional, sus
+  validaciones y el límite por conexión; desarrollo de vistas Pug, calendario,
+  búsquedas y cargas en cascada del frontend; landing page; y configuración
+  del despliegue, las variables de entorno y la persistencia.
+- **Bustamante, Pedro:** infraestructura de comunicación en tiempo real,
+  lógica del chat y redacción de documentación técnica.
+- **Quiroz, Ludmila:** adaptación de controladores a Mongoose, filtrado de
+  información según el rol y esquema/lógica de usuarios internos.
+- **Sabio Barros, Brian:** autenticación JWT en cookie `HttpOnly`, hash de
+  contraseñas con bcrypt, utilidades JWT, middlewares de autenticación y
+  autorización, y actualización del README.
 
 ## 14. Plan técnico recomendado
 
@@ -458,10 +491,11 @@ page.
 
 ## 15. Conclusión
 
-CIKIRE alcanzó una implementación funcional que integra API REST, persistencia
-MongoDB, vistas Pug, autenticación JWT, control de roles y comunicación
-Socket.IO. La evolución desde archivos JSON hasta la versión desplegable
-demuestra un progreso técnico significativo para la entrega de la materia.
+TurnoFlex alcanzó una implementación funcional que integra API REST,
+persistencia MongoDB, vistas Pug, autenticación JWT, control de roles y
+comunicación Socket.IO para CIKIRE. La evolución desde archivos JSON hasta la
+versión desplegable demuestra un progreso técnico significativo para la entrega
+de la materia.
 
 El sistema está correctamente presentado como prototipo académico, siempre que
 se expliciten sus límites. Para un entorno real con información de pacientes

@@ -1,12 +1,13 @@
-# CIKIRE - Sistema de gestión de turnos
+# TurnoFlex - Sistema de gestión de turnos para CIKIRE
 
 Aplicación web monolítica desarrollada para la materia **Desarrollo de
 Sistemas Web Back-End 2A** de la **Tecnicatura Superior en Desarrollo de
 Software - IFTS 29**. El proyecto fue realizado por el equipo TetraCode:
 Berzuini, Flavia; Bustamante, Pedro; Quiroz, Ludmila; y Sabio, Brian.
 
-CIKIRE digitaliza la gestión de pacientes, profesionales, disponibilidades,
-servicios/paquetes y turnos de un centro de kinesiología y rehabilitación.
+TurnoFlex digitaliza la gestión de pacientes, profesionales, disponibilidades,
+servicios/paquetes y turnos de CIKIRE, un centro de kinesiología y
+rehabilitación.
 
 ## Estado actual
 
@@ -78,8 +79,9 @@ La estructura detallada está en
 - Cancelación con devolución de sesión.
 - Atención de turnos por profesionales.
 - Alta y estado de usuarios internos con jerarquía.
-- Chat institucional con historial máximo de 10 mensajes y límite de 8
-  consultas por minuto por conexión.
+- Chat institucional con historial de hasta 10 intercambios conversacionales
+  (20 mensajes de usuario/asistente) y límite de 8 consultas por minuto por
+  conexión.
 - Landing institucional con formulario de contacto simulado en el navegador.
 
 ## Modelo de dominio
@@ -234,7 +236,9 @@ repositorio.
 - [`docs/estructura_carpetas.md`](docs/estructura_carpetas.md)
 - [`docs/modelo_datos.md`](docs/modelo_datos.md)
 
-## Licencia y uso académico
-
+## Uso académico
 Proyecto académico para la materia Desarrollo de Sistemas Web Back-End 2A.
 Las claves, credenciales y datos reales no deben incorporarse al repositorio.
+
+## Licencia
+Este proyecto se distribuye bajo la licencia MIT. Consulta el archivo [LICENSE](LICENSE) para conocer los términos completos.
